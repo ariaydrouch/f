@@ -2,18 +2,10 @@
 %
 %  PYD411 MID-TERM REPORT  --  Phase-field modelling of cell crawling
 %
-%  COMPILE WITH pdflatex (twice). Mid-term limit: 2 pages (+1 permitted).
-%
-%  REQUIRED IMAGE FILES (same folder / figures/)
-%      Logo-IITD.jpg
-%      figures/fig_v2_shapes.pdf
-%      figures/fig_v3_morph.pdf
+%  COMPILE WITH pdflatex (twice).
 %
 %  SUBMITTED PDF NAME (do not miss the two underscores)
 %      THEME_FULL-ENTRY-NUMBER_2601PYD411_MR.pdf
-%
-%  FILLME: student name(s), entry number(s), adviser; THEME and
-%  FULL-ENTRY-NUMBER in the filename.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \documentclass[11pt]{article}
@@ -28,16 +20,17 @@
 \usepackage{hyperref}
 \usepackage[caption=false]{subfig}
 \usepackage{soul,xcolor}
+\usepackage{float}
 
-\setlength{\parskip}{1pt}
-\setlength{\abovedisplayskip}{3pt}
-\setlength{\belowdisplayskip}{3pt}
-\setlength{\floatsep}{4pt}
-\setlength{\textfloatsep}{4pt}
-\setlength{\intextsep}{4pt}
+\setlength{\parskip}{2pt}
+\setlength{\abovedisplayskip}{4pt}
+\setlength{\belowdisplayskip}{4pt}
+\setlength{\floatsep}{8pt}
+\setlength{\textfloatsep}{8pt}
+\setlength{\intextsep}{8pt}
 \makeatletter
 \renewcommand{\section}{\@startsection{section}{1}{\z@}%
-  {-1.0ex plus -0.2ex}{0.5ex}{\normalfont\large\bfseries}}
+  {-1.2ex plus -0.2ex}{0.6ex}{\normalfont\large\bfseries}}
 \makeatother
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -45,19 +38,19 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \thispagestyle{empty}
 \begin{center}
- \includegraphics[height=2.2cm,angle=0]{Logo-IITD.jpg}\\[2pt]
+ \includegraphics[height=2.4cm,angle=0]{Logo-IITD.jpg}\\[2pt]
 \textbf{Dept of Physics, IIT Delhi}\\[4pt]
 \textbf{Course Code : PYD411}\\
 \textbf{Academic Year : 2026 - 2027,\, Semester - I}\\
 \textbf{Mid-term Progress Report}\\[6pt]
 \textbf{\LARGE{Phase-Field Modelling of Crawling Cells}}\\[2pt]
-\textbf{\large{Towards a Tractable Two-Dimensional Model}}\\[6pt]
-\textbf{\large{Name of student 1 (Entry number)}}\\        % FILLME
-%\textbf{\large{Name of student 2 (Entry number)}}\\       % FILLME
-\textbf{\large{Adviser: Prof.\ Firstname Middlename Lastname}}  % FILLME
+\textbf{\large{Towards a Tractable Two-Dimensional Model}}\\[8pt]
+\textbf{\large{Siddharth Kumar (2023PH10741)}}\\
+\textbf{\large{Soumik Roy (2023PH10756)}}\\[4pt]
+\textbf{\large{Adviser: Prof.\ Sujin B.\ Babu}}
 \end{center}
 
-\vspace{4pt}
+\vspace{6pt}
 \noindent
 \textbf{Abstract}:
 We implement a continuum phase-field model of eukaryotic cell crawling,
@@ -72,28 +65,31 @@ flow, active stress and anchoring, recovers the non-motile actin aster and the
 lamellipodial fan. Isolating ingredients shows that in this geometry the shape
 is set almost entirely by anchoring-induced splay of $\mathbf{P}$; the flow
 contributes about $2\%$. We therefore replace the elliptic Stokes solve by its
-friction-dominated limit. The reduced model is about five times faster, agrees
-with the full calculation to $0.2\%$ where they coincide, conserves volume
-rather than projected area, and is local --- the property needed for many
-interacting cells.
+friction-dominated limit. The reduced model crawls steadily (travel $239.9$
+in time $299$ at speed $0.801$), is about five times faster, agrees with the
+full calculation to $0.2\%$ where they coincide, conserves volume rather than
+projected area, and is local --- the property needed for many interacting cells.
 
-\vspace{8pt}
+\vspace{10pt}
 \begin{flushleft}
-Signature of the student: ................
+Signature of the student 1: ................\\[6pt]
+Signature of the student 2: ................
 \end{flushleft}
-\vspace*{-0.85cm}
+\vspace*{-1.35cm}
 \begin{flushright}
 Signature of the adviser: ................
 \end{flushright}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% The template's blank second page is omitted to stay within 2--3 pages.
-% Body continues on the title page so the whole PDF is three pages.
 \vspace{4pt}
 \pagestyle{plain}
 \small
 \setcounter{page}{1}
 \setlength{\parskip}{1pt}
+\setlength{\abovedisplayskip}{3pt}
+\setlength{\belowdisplayskip}{3pt}
+\setlength{\floatsep}{5pt}
+\setlength{\textfloatsep}{5pt}
+\setlength{\intextsep}{5pt}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction and Motivation}
 \label{sec:intro}
@@ -122,7 +118,6 @@ whose accuracy we can quantify (Table~\ref{tab:versions}).
 \begin{center}
 \begin{minipage}{\textwidth}
 \centering
-\small
 \begin{tabular}{|l|l|l|l|}
 \hline
 Ver. & Geometry & Force balance & Area \\
@@ -137,8 +132,9 @@ Ver. & Geometry & Force balance & Area \\
 \hline
 \end{tabular}\\[3pt]
 \refstepcounter{table}\label{tab:versions}
-{\small Table~\thetable: Four stages. Versions~2 and~3 are side view vs.\
-top view; Version~4 is the model for later multi-cell work.}
+{\small Table~\thetable: Four stages of the model. Versions~2 and~3 are
+complementary (side view vs.\ top view). Version~4 is the tractable model
+for later multi-cell work.}
 \end{minipage}
 \end{center}
 
@@ -163,9 +159,9 @@ a\phi^{2}(\phi-1)^{2}
 The first two terms generate interfacial tension. The $\alpha$ terms drive
 $|\mathbf{P}|^{2}=2\phi-1$ inside the cell only. The Frank term aligns
 neighbouring actin. Anchoring $\beta>0$ points $\mathbf{P}$ outward, normal
-to the boundary, and turns out to be the controlling shape parameter.
-Transport is by $\mathbf{u}=\mathbf{v}+w_{0}\mathbf{P}$, with $w_{0}$ the
-treadmilling (polymerisation) speed:
+to the boundary, and is the controlling shape parameter. Transport is by
+$\mathbf{u}=\mathbf{v}+w_{0}\mathbf{P}$, with $w_{0}$ the treadmilling
+(polymerisation) speed:
 \begin{equation}\label{eq:eom}
 \partial_t\phi+\nabla\cdot(\phi\mathbf{u})
 =-M\bigl[\mu_\phi-\Lambda g(\phi)\bigr],\qquad
@@ -194,9 +190,8 @@ Versions~2 and~3 enforce rigid area with a spatially uniform Lagrange
 multiplier $\Lambda=\int\mu_\phi/\int g$~\cite{Rubinstein:1992}.
 A real cell has roughly constant \textit{volume} $V_{0}\simeq hA$, so
 spreading is allowed if paid for by thinning; Version~4 uses the soft law
-$\Lambda=-k_{A}(A/A_{0}-1)$.
-Advection is written in conservative flux form on a periodic grid and advanced
-by explicit Euler.
+$\Lambda=-k_{A}(A/A_{0}-1)$. Advection is written in conservative flux form
+on a periodic grid and advanced by explicit Euler.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Results and discussion}
@@ -208,7 +203,7 @@ With $\mathbf{v}=\zeta=\beta=0$ a disc translates but cannot change shape
 (uniform $\mathbf{P}$ gives uniform $\mathbf{u}$) and loses $4.5\%$ of its
 area to non-conservative advection.
 
-\textbf{Version 2.}
+\textbf{Version 2: protrusion at the wall.}
 The thin protrusion of Ref.~\cite{Tjhung:2015} is a near-substrate structure,
 so we work in a vertical $(y,z)$ slice with
 $w(z)=\frac{w_{0}}{2}\bigl[1-\tanh((z-\lambda)/w_\tau)\bigr]$
@@ -216,78 +211,123 @@ and the Brinkman closure
 $(1-\ell_v^{2}\partial_z^{2})\mathbf{u}=w(z)\mathbf{P}$,
 $\ell_v=\sqrt{\eta/\xi}$. Near-wall material runs out ahead of the body;
 tension pulls it back; that competition \textit{is} the protrusion
-(Fig.~\ref{fig:results}a,b). At $w_{0}=0.3$ the cell stays a hemispherical
-cap (contact $44.0$, speed $0.050$); at $w_{0}=2.0$ it draws a thin leading
-layer (contact $63.0$, speed $0.432$). Volume is conserved to $10^{-16}$.
-The contact length is flat below $w_{0}\approx0.8$ and then rises, close to
-the estimate $M\varepsilon^{2}/\lambda\approx0.75$.
+(Fig.~\ref{fig:v2}a,b). At $w_{0}=0.3$ the cell stays a hemispherical
+cap (contact length $44.0$, speed $0.050$); at $w_{0}=2.0$ it draws a thin
+leading layer (contact $63.0$, speed $0.432$). Volume is conserved to
+$10^{-16}$.
 
-\begin{figure}[h]
+Sweeping $w_{0}$ (Fig.~\ref{fig:v2}c) shows the protrusion transition: the
+contact length is nearly flat below $w_{0}\approx0.8$ and then rises
+steeply, close to $M\varepsilon^{2}/\lambda\approx0.75$. The lamella length
+and crawl speed rise in the same window.
+
+\begin{figure}[H]
 \centering
-\includegraphics[width=12.4cm]{figures/fig_v2_shapes.pdf}
-\caption{Version~2, vertical slice, wall at $z=0$ (green). The two runs
-differ only in $w_{0}$. (a)~$w_{0}=0.3$: hemispherical cap. (b)~$w_{0}=2.0$:
-thin leading protrusion. White arrows: $\mathbf{P}$. Volume error
-$10^{-16}$.}
-\label{fig:results}
+\includegraphics[width=13.2cm,height=4.15cm,keepaspectratio]{figures/fig_v2_shapes.pdf}\\[3pt]
+\includegraphics[width=13.2cm,height=2.55cm,keepaspectratio]{figures/fig_v2_transition.pdf}
+\caption{Version~2. Top: vertical slice, wall at $z=0$ (green);
+(a)~$w_{0}=0.3$, hemispherical cap; (b)~$w_{0}=2.0$, thin leading
+protrusion. Arrows: $\mathbf{P}$. Volume error $10^{-16}$.
+Bottom: contact length, lamella length and crawl speed versus $w_{0}$.}
+\label{fig:v2}
 \end{figure}
 
-\textbf{Version 3.}
+\textbf{Version 3: shapes in the plane.}
 The catalogued shapes of Ref.~\cite{Tjhung:2015} are top views, so Version~3
-solves the complete plane system. The passive limit is verified: an ellipse
-relaxes to a circle (aspect $1.689\to1.010$), $F$ decreases, the flow dies and
-the volume error is exactly zero. With activity, strong outward anchoring
-locks $\mathbf{P}$ into a radial aster: $|\langle\mathbf{P}\rangle|=0$ and the speed is zero to
-machine precision, the fried egg of Ref.~\cite{Tjhung:2015} and of
-experiment~\cite{Yam:2007}. Moderate anchoring gives a fan elongated
-\textit{across} the path (aspect $2.91$, speed $0.843\approx w_{0}$), the
-keratocyte lamellipodium. A plane pseudopod cannot form (contractility only widens the cell) and the
-phagocytic cup is three-dimensional.
+solves the complete plane system. The passive limit is verified first: an
+ellipse relaxes to a circle (aspect $1.689\to1.010$), the free energy
+decreases, the flow dies and the volume error is exactly zero.
 
-A $2\times2$ control isolates the two shape mechanisms.
-Neither: translating disc, aspect $1.07$. Flow alone: $1.61$. Anchoring
-alone: $2.85$. Both: $2.92$ ($\approx2\%$ above anchoring). Speed is
-$0.80$--$0.85$ in every case, set by $w_{0}\langle\mathbf{P}\rangle$.
+With activity (Fig.~\ref{fig:v3}, top), strong outward anchoring locks
+$\mathbf{P}$ into a radial aster: $|\langle\mathbf{P}\rangle|=0$ and the
+speed is zero to machine precision, the fried egg of
+Ref.~\cite{Tjhung:2015} and of experiment~\cite{Yam:2007}. Moderate anchoring
+gives a fan elongated \textit{across} the path (aspect $2.91$, speed
+$0.843\approx w_{0}$), the keratocyte lamellipodium. Driving anchoring harder
+gives a more extreme fan (aspect $4.35$). A plane pseudopod cannot form
+(contractility only widens the cell) and the phagocytic cup is
+three-dimensional; Version~2 already captures the vertical mechanism of the
+former.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=13.2cm,height=5.4cm,keepaspectratio]{figures/fig_v3_morph.pdf}\\[3pt]
+\includegraphics[width=13.2cm,height=2.7cm,keepaspectratio]{figures/fig_v3_decomp.pdf}
+\caption{Version~3. Top: morphologies at $w_{0}=1$ --- $\phi$ and
+$\mathbf{P}$ (upper row) and flow $\mathbf{v}$ (lower row).
+(a)~Aster, not motile. (b)~Lamellipodial fan, aspect $2.91$, speed $0.843$.
+(c)~Stronger fan, aspect $4.35$. Bottom: $2\times2$ of anchoring vs.\ flow;
+anchoring alone $1.07\to2.85$, both together $2.92$ ($+2\%$).}
+\label{fig:v3}
+\end{figure}
+
+A $2\times2$ control (Fig.~\ref{fig:v3}, bottom) isolates the two shape
+mechanisms. Neither: translating disc, aspect $1.07$. Flow alone: $1.61$.
+Anchoring alone: $2.85$. Both: $2.92$ ($\approx2\%$ above anchoring). Speed
+is $0.80$--$0.85$ in every case, set by $w_{0}\langle\mathbf{P}\rangle$.
 Sweeping $\xi$ over a $32$-fold range screens the flow as $1/\xi$, leaves the
-speed almost unchanged, and saturates the aspect onto the flow-free value
-$2.85$. The flat speed disagrees with the biphasic curve of
+speed almost unchanged ($0.829$--$0.845$), and saturates the aspect onto the
+flow-free value $2.85$. The flat speed disagrees with the biphasic curve of
 Ref.~\cite{Leoni:2017}: there propulsion is traction and requires
 mechanosensitive bonds, which a constant $\xi$ cannot see.
 
-\textbf{Version 4.}
+\textbf{Version 4: a crawling cell without Stokes.}
 The Darcy reduction is local and algebraic. Only the active part
 $\mathbf{v}=-(\zeta/\xi)\nabla\cdot(\phi\mathbf{P}\mathbf{P})$ is kept
 (vorticity and flow alignment change the shape by $<1\%$). Contractility is
-recalibrated to $\zeta=-0.25$ (without pressure the same $\zeta$ is $\sim10\times$
-too strong). The cell travels $239.9$ length units in time $299$ at speed
-$0.801$. Where Versions~3 and~4 coincide (flow off, rigid area) they agree to
-$0.2\%$. Soft volume ($k_{A}=5$) lets the cell spread and thin by $15\%$;
-the effect on speed is $<1\%$, on shape $35\%$. Removing the constraint
-inflates the cell $14$-fold and stops crawling. Cost falls from $2.70$ to
+recalibrated to $\zeta=-0.25$ (without pressure the same $\zeta$ is
+$\sim10\times$ too strong).
+
+Figure~\ref{fig:v4} is the main result. In the laboratory frame the cell
+travels $239.9$ length units in time $299$ at a steady speed $0.801$: the
+circular seed becomes a fan elongated across its path and then crawls in a
+straight line. Cell-centred snapshots show $\phi$ and the mean polarization
+at $t=0$, $100$ and $299$. The centre of mass advances linearly in $x$ with
+$y_{\mathrm{cm}}=0$; the speed is constant; the aspect ratio saturates near
+$3.2$; $A/A_{0}$ grows by $\approx15\%$ and the implied thickness
+$h=V_{0}/A$ falls by the same factor.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=13.4cm,height=2.85cm,keepaspectratio]{figures/fig_v4_montage.pdf}\\[2pt]
+\includegraphics[width=13.4cm,height=2.85cm,keepaspectratio]{figures/fig_v4_snapshots.pdf}\\[2pt]
+\includegraphics[width=13.4cm,height=2.15cm,keepaspectratio]{figures/fig_v4_diagnostics.pdf}\\[2pt]
+\includegraphics[width=13.4cm,height=2.15cm,keepaspectratio]{figures/fig_v4_area.pdf}
+\caption{Version~4 crawling (the main result). (a)~Laboratory-frame
+outlines coloured by time; travel $239.9$ at speed $0.801$.
+(b)~$\phi$ at $t=0$, $100$, $299$ (red arrow: mean $\mathbf{P}$).
+(c)~$x_{\mathrm{cm}}$ (linear), speed ($0.801$), aspect ratio ($\to3.2$),
+$A/A_{0}$ and $h/h_{0}$.
+(d)~Soft volume: $A/A_{0}(t)$ and aspect ratio for several $k_{A}$;
+$k_{A}=0$ inflates $\sim14\times$.}
+\label{fig:v4}
+\end{figure}
+
+Where Versions~3 and~4 coincide (flow off, rigid area) they agree to
+$0.2\%$. Soft volume ($k_{A}=5$) changes speed by $<1\%$ and shape by
+$35\%$ (Fig.~\ref{fig:v4}d). Removing the constraint ($k_{A}=0$) inflates
+the cell $14$-fold and stops crawling. Cost falls from $2.70$ to
 $1.10\,\mathrm{ms}$/step and the stable $dt$ rises from $0.01$ to $0.03$,
-about $5\times$ overall; every operation is a local stencil.
+about $5\times$ overall.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions and future scope}
 \label{sec:Conclusion}
 
 \noindent
-The model has been implemented in four stages and verified at each. Volume is
-conserved to machine precision where it should be. A substrate-confined
-treadmilling layer produces a protrusion and a transition at
-$w_{0}\approx M\varepsilon^{2}/\lambda$. The plane model recovers the aster
-and the lamellipodial fan. In this geometry the shape is predominantly
-anchoring-driven; hydrodynamics adds $\approx2\%$. The friction-dominated
-reduction is $\approx5\times$ faster, agrees to $0.2\%$ where comparable, and
-is local. Conserving volume rather than area lets the cell spread and thin;
-dropping the constraint entirely is not viable.
-
-Next: two distinguishable cells with repulsive overlap; collisions (contact
-inhibition as a prediction); spontaneous polarity; load-dependent friction to
-test Ref.~\cite{Leoni:2017}; then small collectives.
+The four stages are verified. Volume is conserved to machine precision
+where it should be. A substrate-confined treadmilling layer produces a
+protrusion and a transition at $w_{0}\approx M\varepsilon^{2}/\lambda$
+(Fig.~\ref{fig:v2}). The plane model recovers the aster and the
+lamellipodial fan (Fig.~\ref{fig:v3}); shape is anchoring-driven
+($+2\%$ from flow). Version~4 crawls at speed $0.801$
+(Fig.~\ref{fig:v4}), is $\approx5\times$ faster, agrees to $0.2\%$ where
+comparable, and is local. Soft volume lets the cell spread and thin;
+$k_{A}=0$ is not viable. Next: two cells, collisions, spontaneous
+polarity, load-dependent friction~\cite{Leoni:2017}, then collectives.
 
 \section*{Acknowledgements}
-The author thanks Prof.\ Firstname Lastname for suggesting the problem and for
+The authors thank Prof.\ Sujin B.\ Babu for suggesting the problem and for
 guidance on volume conservation and on replacing the Stokes solve.
 
 {\footnotesize
