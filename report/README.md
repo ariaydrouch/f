@@ -3,7 +3,7 @@
 LaTeX source follows `Sample_BTP_Latex.tex` (same class, preamble,
 title-page layout and section structure). The template's blank second
 page is omitted. Result figures are included in full, so the compiled
-PDF is 5 pages (the instructor allowed one extra page on a 2-page
+PDF is 4 pages (the instructor allowed one extra page on a 2-page
 brief; the extra length is the crawling and quantitative plots).
 
 ## Files
@@ -34,6 +34,9 @@ Prof. Sujin B. Babu.
 Rename the PDF to `THEME_FULL-ENTRY-NUMBER_2601PYD411_MR.pdf`
 (two underscores), e.g. `SOFTMATTER_2023PH10741_2601PYD411_MR.pdf`.
 One student uploads before 12:00 noon.
+
+The mid-term slides are `presentation/PYD411_midsem_presentation.pptx`
+(8 slides, editable). See `presentation/README.md`.
 
 ## Compiling
 
