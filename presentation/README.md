@@ -20,11 +20,14 @@ python3 presentation/build_midsem_pptx.py
 1. Title
 2. What makes a crawling cell move? (biology ↔ model fields, two-column)
 3. Free energy roles + Stokes force balance + four-version table
-4. Versions 1 and 2 (protrusion + \(w_0\) plots)
-5. Version 3 (aster / fan + anchoring-vs-flow 2×2)
-6. Version 4 — the reduction from Stokes to Darcy, and the crawl
-7. Four take-homes
-8. Future work and questions
+4. How the cell is simulated — the per-timestep update loop (φ, P, active
+   force, velocity, transport, back to φ), using the exact evolution
+   equations from the report/implementation
+5. Versions 1 and 2 (protrusion + \(w_0\) plots)
+6. Version 3 (aster / fan + anchoring-vs-flow 2×2)
+7. Version 4 — the reduction from Stokes to Darcy, and the crawl
+8. Four take-homes
+9. Future work and questions
 
 Every slide has a speaker note (open the Notes pane in PowerPoint /
 Google Slides to see it).

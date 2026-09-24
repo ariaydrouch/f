@@ -240,7 +240,7 @@ def slide_title(prs):
          RGBColor(0xA8, 0xC5, 0xD4))
 
     box, tf = textbox(s, Inches(0.7), Inches(6.95), Inches(12), Inches(0.4))
-    para(tf, "8 minutes  ·  8 slides  ·  2 minutes for discussion",
+    para(tf, "8 minutes  ·  9 slides  ·  2 minutes for discussion",
          13, False, RGBColor(0xA8, 0xC5, 0xD4), first=True, space_after=0)
 
     notes(s, "We are modelling crawling cells using a phase-field description "
@@ -254,7 +254,7 @@ def slide_biology(prs):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     add_box(s, Inches(0), Inches(0), Inches(13.333), Inches(7.5), WHITE)
     header_bar(s, "What makes a crawling cell move?")
-    footer(s, 2)
+    footer(s, 2, n=9)
 
     # LEFT column -- physical mechanisms
     lx, lw = Inches(0.35), Inches(6.15)
@@ -350,7 +350,7 @@ def slide_model(prs):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     add_box(s, Inches(0), Inches(0), Inches(13.333), Inches(7.5), WHITE)
     header_bar(s, "The model: shape, polarity and mechanics")
-    footer(s, 3)
+    footer(s, 3, n=9)
 
     eqbox(s, Inches(0.35), Inches(1.02), Inches(12.63), Inches(0.62),
           [[T("F", italic=True, size=20), T("  =  F"), T("interface", sub=True, size=15),
@@ -430,13 +430,173 @@ def slide_model(prs):
               "model for many-cell simulations.")
 
 
+# ------------------------------------------------------ slide 4 (new) --
+
+def _arrow(s, y, x=Inches(0), w=Inches(13.333), size=13):
+    b, tf = textbox(s, x, y, w, Inches(0.15))
+    para(tf, "\u2193", size, True, TEAL, PP_ALIGN.CENTER, first=True, space_after=0)
+
+
+def slide_loop(prs):
+    s = prs.slides.add_slide(prs.slide_layouts[6])
+    add_box(s, Inches(0), Inches(0), Inches(13.333), Inches(7.5), WHITE)
+    header_bar(s, "How the cell is simulated",
+               "Coupled evolution of cell shape, actin polarity and active motion")
+    footer(s, 4, n=9)
+
+    lx, lw = Inches(0.35), Inches(6.05)
+    rx, rw = Inches(6.65), Inches(6.33)
+
+    # start box, centred
+    eqbox(s, Inches(4.55), Inches(0.95), Inches(4.20), Inches(0.34),
+          [[T("\u03c6"), T("n", sup=True), T(", "), T("P", bold=True), T("n", sup=True)]],
+          size=15)
+    _arrow(s, Inches(1.30))
+
+    # free energy (shared)
+    eqbox(s, Inches(3.15), Inches(1.46), Inches(7.05), Inches(0.50),
+          [[T("FREE ENERGY   ", bold=True, size=10.5, color=TEAL),
+            T("\u03bc = \u03b4F/\u03b4\u03c6", size=13.5),
+            T("      \u03b4F/\u03b4"), T("P", bold=True, size=13.5)]],
+          size=13.5)
+    b, tf = textbox(s, Inches(3.15), Inches(1.98), Inches(7.05), Inches(0.16))
+    para(tf, "\u03bc \u2192 shape evolution      \u03b4F/\u03b4P \u2192 polarization relaxation",
+         10, False, MUTED, PP_ALIGN.CENTER, first=True, space_after=0)
+    _arrow(s, Inches(2.16))
+
+    y0 = Inches(2.32)
+
+    # --- LEFT branch: P -> active force -> velocity -> u ---
+    eqbox(s, lx, y0, lw, Inches(0.70),
+          [[T("UPDATE P   ", bold=True, size=11, color=TEAL),
+            T("(P"), T("n", sup=True, size=10.5), T(" \u2192 P"), T("n+1", sup=True, size=10.5), T(")")],
+           [T("\u2202"), T("t", sub=True), T("P", bold=True, size=12),
+            T(" + ("), T("u", bold=True, size=12), T("\u00b7\u2207)"),
+            T("P", bold=True, size=12), T(" = \u2212\u03a9\u00b7"), T("P", bold=True, size=12),
+            T(" + \u03c7D\u00b7"), T("P", bold=True, size=12), T(" \u2212 h/\u0393", size=12)]],
+          size=12, line_gap=2)
+    b, tf = textbox(s, lx, y0 + Inches(0.72), lw, Inches(0.15))
+    para(tf, "advection + relaxation terms  \u00b7  P: local direction & strength of actin",
+         9.5, False, MUTED, PP_ALIGN.CENTER, first=True, space_after=0)
+    _arrow(s, y0 + Inches(0.90), lx, lw, size=12)
+
+    y1 = y0 + Inches(1.06)
+    eqbox(s, lx, y1, lw, Inches(0.46),
+          [[T("f"), T("act", sub=True), T(" = \u2212\u03b6 \u2207\u00b7(\u03c6", size=14),
+            T("P", bold=True, size=15), T("P", bold=True, size=15), T(")", size=14)]],
+          size=15)
+    b, tf = textbox(s, lx, y1 + Inches(0.48), lw, Inches(0.15))
+    para(tf, "polarised actomyosin stress drives cytoplasmic motion", 9.5, False, MUTED,
+         PP_ALIGN.CENTER, first=True, space_after=0)
+    _arrow(s, y1 + Inches(0.64), lx, lw, size=12)
+
+    y2 = y1 + Inches(0.80)
+    add_round(s, lx, y2, lw, Inches(0.72), EQBG, TEAL, 1.25, radius=0.12)
+    add_box(s, lx + Inches(lw.inches / 2) - Inches(0.005), y2 + Inches(0.05),
+            Inches(0.01), Inches(0.62), LINE)
+    b, tf = textbox(s, lx, y2 + Inches(0.03), Inches(lw.inches / 2), Inches(0.66))
+    para(tf, "Full model", 10, True, NAVY, PP_ALIGN.CENTER, first=True, space_after=1)
+    mathpara(tf, [T("0=\u2212\u2207p+\u03b7\u2207"), T("2", sup=True, size=9.5),
+                  T("v", bold=True, size=10), T("\u2212\u03be"), T("v", bold=True, size=10),
+                  T("+f", bold=True, italic=True, size=10)], size=10, color=DARK,
+             align=PP_ALIGN.CENTER, space_after=1)
+    para(tf, "\u2192 solve Stokes", 9, False, MUTED, PP_ALIGN.CENTER, space_after=0)
+    b, tf = textbox(s, lx + Inches(lw.inches / 2), y2 + Inches(0.03), Inches(lw.inches / 2), Inches(0.66))
+    para(tf, "Version 4", 10, True, TEAL, PP_ALIGN.CENTER, first=True, space_after=1)
+    mathpara(tf, [T("v", bold=True, size=12.5), T(" = f", bold=True, italic=True, size=12.5),
+                  T("/\u03be", size=12.5)], size=12.5, color=NAVY, align=PP_ALIGN.CENTER, space_after=1)
+    mathpara(tf, [T("= \u2212(\u03b6/\u03be)\u2207\u00b7(\u03c6", size=10),
+                  T("P", bold=True, size=10), T("P", bold=True, size=10), T(")", size=10)],
+             size=10, color=DARK, align=PP_ALIGN.CENTER, space_after=0)
+    b, tf = textbox(s, lx, y2 + Inches(0.74), lw, Inches(0.15))
+    para(tf, "V4: local velocity \u2014 no global pressure / Stokes solve", 9.5, False, MUTED,
+         PP_ALIGN.CENTER, first=True, space_after=0)
+    _arrow(s, y2 + Inches(0.90), lx, lw, size=12)
+
+    y3 = y2 + Inches(1.06)
+    eqbox(s, lx, y3, lw, Inches(0.46),
+          [[T("u", bold=True, size=17), T("  =  "), T("v", bold=True, size=17),
+            T("  +  w"), T("0", sub=True), T("P", bold=True, size=17)]],
+          size=15, fill=SOFT)
+    b, tf = textbox(s, lx, y3 + Inches(0.48), lw, Inches(0.16))
+    para(tf, "v: mechanical / friction-driven motion  \u00b7  w\u2080P: actin treadmilling",
+         9.5, False, MUTED, PP_ALIGN.CENTER, first=True, space_after=0)
+
+    left_end = y3 + Inches(0.64)  # bottom of the u-box caption
+
+    # --- RIGHT branch: update phi (spans the same vertical range) ---
+    ry = y0
+    rh = left_end - y0
+    add_round(s, rx, ry, rw, rh, SOFT, TEAL, 1.25, radius=0.08)
+    b, tf = textbox(s, rx + Inches(0.20), ry + Inches(0.12), rw - Inches(0.40), rh - Inches(0.24),
+                     anchor=MSO_ANCHOR.TOP)
+    para(tf, "UPDATE \u03c6   (\u03c6\u207f \u2192 \u03c6\u207f\u207a\u00b9)", 13, True, TEAL,
+         first=True, space_after=8)
+    mathpara(tf, [T("\u2202"), T("t", sub=True), T("\u03c6", italic=True, size=16),
+                  T(" + \u2207\u00b7(\u03c6", size=16), T("u", bold=True, size=16), T(")", size=16),
+                  T(" = \u2212M[\u03bc \u2212 \u039b g(\u03c6)]", size=16)],
+             size=16, color=NAVY, align=PP_ALIGN.CENTER, space_after=10)
+    p = tf.add_paragraph()
+    p.alignment = PP_ALIGN.CENTER
+    p.space_after = Pt(10)
+    r = p.add_run(); _set_run(r, "uses  ", 12, False, DARK)
+    r = p.add_run(); _set_run(r, "u", 12, True, TEAL)
+    r = p.add_run(); _set_run(r, "  (transport) and  ", 12, False, DARK)
+    r = p.add_run(); _set_run(r, "\u03bc", 12, True, TEAL)
+    r = p.add_run(); _set_run(r, "  (from the free energy)", 12, False, DARK)
+    para(tf, "\u03c6 determines the cell boundary and therefore the cell shape.",
+         12.5, False, DARK, align=PP_ALIGN.CENTER, space_after=10)
+    para(tf, "g(\u03c6) = \u03c6(1\u2212\u03c6),   \u039b enforces area / volume conservation",
+         10, False, MUTED, align=PP_ALIGN.CENTER, space_after=0)
+
+    # loop-back line, full width
+    yl = left_end + Inches(0.06)
+    b, tf = textbox(s, Inches(0.35), yl, Inches(12.63), Inches(0.24))
+    p = tf.paragraphs[0]
+    p.alignment = PP_ALIGN.CENTER
+    r = p.add_run(); _set_run(r, "\u21bb  ", 12.5, True, TEAL)
+    r = p.add_run(); _set_run(r, "\u03c6", 12.5, True, NAVY, italic=True)
+    r = p.add_run(); _set_run(r, "n+1", 9.5, True, NAVY)
+    _subscript(r, sub=False, sup=True)
+    r = p.add_run(); _set_run(r, ", ", 12.5, True, NAVY)
+    r = p.add_run(); _set_run(r, "P", 12.5, True, NAVY)
+    r = p.add_run(); _set_run(r, "n+1", 9.5, True, NAVY)
+    _subscript(r, sub=False, sup=True)
+    r = p.add_run(); _set_run(r, "   \u2192   next timestep (t+\u0394t)   \u2192   back to  ", 12.5, False, DARK)
+    r = p.add_run(); _set_run(r, "\u03c6", 12.5, True, NAVY, italic=True)
+    r = p.add_run(); _set_run(r, "n", 9.5, True, NAVY)
+    _subscript(r, sub=False, sup=True)
+    r = p.add_run(); _set_run(r, ", ", 12.5, False, DARK)
+    r = p.add_run(); _set_run(r, "P", 12.5, True, NAVY)
+    r = p.add_run(); _set_run(r, "n", 9.5, True, NAVY)
+    _subscript(r, sub=False, sup=True)
+
+    # bottom take-away
+    yb = yl + Inches(0.30)
+    add_round(s, Inches(0.35), yb, Inches(12.63), Inches(0.72), NAVY)
+    b, tf = textbox(s, Inches(0.60), yb + Inches(0.09), Inches(12.15), Inches(0.56))
+    para(tf, "Shape \u03c6  \u2192  polarity P  \u2192  active force  \u2192  velocity v  "
+              "\u2192  transport u  \u2192  shape update  \u2192  repeat",
+         14, True, WHITE, first=True, space_after=4)
+    para(tf, "This loop is repeated for every timestep.", 11.5, False,
+         RGBColor(0x7E, 0xD9, 0xC8))
+
+    notes(s, "At every timestep we compute the functional derivatives of the "
+              "free energy, update the polarization P by its relaxation and "
+              "advection equation, form the active force from P, obtain the "
+              "velocity either from the full Stokes solve or the local Darcy "
+              "law of Version 4, assemble the total transport velocity u, "
+              "and use u and mu to advance phi. The loop then repeats for "
+              "the next timestep.")
+
+
 # --------------------------------------------------------------- slide 4 --
 
 def slide_v12(prs):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     add_box(s, Inches(0), Inches(0), Inches(13.333), Inches(7.5), WHITE)
     header_bar(s, "From a translating disc to a leading protrusion")
-    footer(s, 4)
+    footer(s, 5, n=9)
 
     lx, lw = Inches(0.32), Inches(4.35)
     add_round(s, lx, Inches(1.02), lw, Inches(1.85), LIGHT)
@@ -513,7 +673,7 @@ def slide_v3(prs):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     add_box(s, Inches(0), Inches(0), Inches(13.333), Inches(7.5), WHITE)
     header_bar(s, "Full Stokes model: anchoring controls shape")
-    footer(s, 5)
+    footer(s, 6, n=9)
 
     lx, lw = Inches(0.32), Inches(3.55)
     add_round(s, lx, Inches(1.00), lw, Inches(1.65), LIGHT)
@@ -601,7 +761,7 @@ def slide_v4(prs):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     add_box(s, Inches(0), Inches(0), Inches(13.333), Inches(7.5), WHITE)
     header_bar(s, "Version 4 \u2014 crawling without a Stokes solve")
-    footer(s, 6)
+    footer(s, 7, n=9)
 
     # left column: the reduction, stacked equations
     lx, lw = Inches(0.32), Inches(4.55)
@@ -686,7 +846,7 @@ def slide_learn(prs):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     add_box(s, Inches(0), Inches(0), Inches(13.333), Inches(7.5), WHITE)
     header_bar(s, "What the simulations establish")
-    footer(s, 7)
+    footer(s, 8, n=9)
 
     items = [
         ("01", "A spatial gradient in treadmilling can generate a leading protrusion.",
@@ -727,7 +887,7 @@ def slide_next(prs):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     add_box(s, Inches(0), Inches(0), Inches(13.333), Inches(7.5), WHITE)
     header_bar(s, "From one cell to many")
-    footer(s, 8)
+    footer(s, 9, n=9)
 
     items = [
         ("1", "Two cells", "One field pair per cell + repulsive overlap."),
@@ -765,6 +925,7 @@ def main():
     slide_title(prs)
     slide_biology(prs)
     slide_model(prs)
+    slide_loop(prs)
     slide_v12(prs)
     slide_v3(prs)
     slide_v4(prs)
