@@ -37,6 +37,13 @@ Two ingredients make this work without a Navier–Stokes solver:
 Results reproduced qualitatively: the two shape regimes of Fig. 1a, the
 protrusion transition in $w_0$ of Fig. 1b, and the effect of adhesion of Fig. 1c.
 
+## Mid-term report
+
+The PYD411 mid-term write-up is `report/THEME_FULL-ENTRY-NUMBER_2601PYD411_MR.tex`
+(same IIT Delhi BTP template; 3 pages). Fill the `FILLME` fields and rename the
+PDF to `THEME_FULL-ENTRY-NUMBER_2601PYD411_MR.pdf` before upload. See
+`report/README.md`.
+
 ## Running
 
 ```bash
