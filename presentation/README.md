@@ -18,10 +18,20 @@ python3 presentation/build_midsem_pptx.py
 ## Slide list
 
 1. Title
-2. Actin / myosin / adhesions → \(w_0\mathbf{P}\), \(\zeta\), \(\xi\)
-3. Fields, force balance, four-version table
+2. What makes a crawling cell move? (biology ↔ model fields, two-column)
+3. Free energy roles + Stokes force balance + four-version table
 4. Versions 1 and 2 (protrusion + \(w_0\) plots)
-5. Version 3 (aster / fan + anchoring vs flow)
-6. Version 4 crawl (montage, snapshots, diagnostics)
+5. Version 3 (aster / fan + anchoring-vs-flow 2×2)
+6. Version 4 — the reduction from Stokes to Darcy, and the crawl
 7. Four take-homes
 8. Future work and questions
+
+Every slide has a speaker note (open the Notes pane in PowerPoint /
+Google Slides to see it).
+
+Numbers are consistency-checked against the report: thickness is
+reported as \(h/h_0\approx0.87\) (≈13% thinning), the ≈5× speed-up is
+described as the overall runtime improvement (it includes the larger
+stable time-step, not just the ms/step ratio), all lengths/times are
+plain model units (no physical unit is claimed), and the "choose their
+own direction" polarity item is listed only as future work.
