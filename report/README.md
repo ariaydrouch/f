@@ -36,7 +36,8 @@ Rename the PDF to `THEME_FULL-ENTRY-NUMBER_2601PYD411_MR.pdf`
 One student uploads before 12:00 noon.
 
 The mid-term slides are `presentation/PYD411_midsem_presentation.pptx`
-(8 slides, editable). See `presentation/README.md`.
+(10 slides, editable, now including an embedded two-cell collision
+video). See `presentation/README.md`.
 
 ## Compiling
 

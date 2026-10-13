@@ -1,6 +1,6 @@
 # PYD411 mid-term slides
 
-Editable 16:9 PowerPoint, 8 slides, written for the 8 + 2 minute slot.
+Editable 16:9 PowerPoint, 10 slides, written for the 8 + 2 minute slot.
 
 ```
 PYD411_midsem_presentation.pptx   open this in PowerPoint / Google Slides / LibreOffice
@@ -26,8 +26,11 @@ python3 presentation/build_midsem_pptx.py
 5. Versions 1 and 2 (protrusion + \(w_0\) plots)
 6. Version 3 (aster / fan + anchoring-vs-flow 2×2)
 7. Version 4 — the reduction from Stokes to Darcy, and the crawl
-8. Four take-homes
-9. Future work and questions
+8. **Already underway: a first two-cell experiment** — embedded 3-second
+   video of a glancing collision (from the `cursor/two-cell-crawling-7d60`
+   branch), plus the one new free-energy term that couples the cells
+9. Four take-homes
+10. Future work and questions
 
 Every slide has a speaker note (open the Notes pane in PowerPoint /
 Google Slides to see it).

@@ -240,7 +240,7 @@ def slide_title(prs):
          RGBColor(0xA8, 0xC5, 0xD4))
 
     box, tf = textbox(s, Inches(0.7), Inches(6.95), Inches(12), Inches(0.4))
-    para(tf, "8 minutes  ·  9 slides  ·  2 minutes for discussion",
+    para(tf, "8 minutes  ·  10 slides  ·  2 minutes for discussion",
          13, False, RGBColor(0xA8, 0xC5, 0xD4), first=True, space_after=0)
 
     notes(s, "We are modelling crawling cells using a phase-field description "
@@ -254,7 +254,7 @@ def slide_biology(prs):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     add_box(s, Inches(0), Inches(0), Inches(13.333), Inches(7.5), WHITE)
     header_bar(s, "What makes a crawling cell move?")
-    footer(s, 2, n=9)
+    footer(s, 2, n=10)
 
     # LEFT column -- physical mechanisms
     lx, lw = Inches(0.35), Inches(6.15)
@@ -350,7 +350,7 @@ def slide_model(prs):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     add_box(s, Inches(0), Inches(0), Inches(13.333), Inches(7.5), WHITE)
     header_bar(s, "The model: shape, polarity and mechanics")
-    footer(s, 3, n=9)
+    footer(s, 3, n=10)
 
     eqbox(s, Inches(0.35), Inches(1.02), Inches(12.63), Inches(0.62),
           [[T("F", italic=True, size=20), T("  =  F"), T("interface", sub=True, size=15),
@@ -442,7 +442,7 @@ def slide_loop(prs):
     add_box(s, Inches(0), Inches(0), Inches(13.333), Inches(7.5), WHITE)
     header_bar(s, "How the cell is simulated",
                "Coupled evolution of cell shape, actin polarity and active motion")
-    footer(s, 4, n=9)
+    footer(s, 4, n=10)
 
     lx, lw = Inches(0.35), Inches(6.05)
     rx, rw = Inches(6.65), Inches(6.33)
@@ -596,7 +596,7 @@ def slide_v12(prs):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     add_box(s, Inches(0), Inches(0), Inches(13.333), Inches(7.5), WHITE)
     header_bar(s, "From a translating disc to a leading protrusion")
-    footer(s, 5, n=9)
+    footer(s, 5, n=10)
 
     lx, lw = Inches(0.32), Inches(4.35)
     add_round(s, lx, Inches(1.02), lw, Inches(1.85), LIGHT)
@@ -673,7 +673,7 @@ def slide_v3(prs):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     add_box(s, Inches(0), Inches(0), Inches(13.333), Inches(7.5), WHITE)
     header_bar(s, "Full Stokes model: anchoring controls shape")
-    footer(s, 6, n=9)
+    footer(s, 6, n=10)
 
     lx, lw = Inches(0.32), Inches(3.55)
     add_round(s, lx, Inches(1.00), lw, Inches(1.65), LIGHT)
@@ -761,7 +761,7 @@ def slide_v4(prs):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     add_box(s, Inches(0), Inches(0), Inches(13.333), Inches(7.5), WHITE)
     header_bar(s, "Version 4 \u2014 crawling without a Stokes solve")
-    footer(s, 7, n=9)
+    footer(s, 7, n=10)
 
     # left column: the reduction, stacked equations
     lx, lw = Inches(0.32), Inches(4.55)
@@ -840,13 +840,75 @@ def slide_v4(prs):
               "and is substantially cheaper.")
 
 
+# ------------------------------------------------------ slide 8 (new) --
+
+def slide_two_cell(prs):
+    s = prs.slides.add_slide(prs.slide_layouts[6])
+    add_box(s, Inches(0), Inches(0), Inches(13.333), Inches(7.5), WHITE)
+    header_bar(s, "Already underway: a first two-cell experiment",
+               "Same Version 4 physics per cell, one new free-energy term couples them")
+    footer(s, 8, n=10)
+
+    video_path = ASSETS / "two_cell_collision.mp4"
+    poster_path = ASSETS / "two_cell_poster.png"
+    vh = Inches(5.05)
+    vw = vh  # the clip is square (640x640)
+    vl = Inches(0.45)
+    vt = Inches(1.15)
+    if video_path.exists():
+        s.shapes.add_movie(str(video_path), vl, vt, vw, vh,
+                            poster_frame_image=str(poster_path) if poster_path.exists() else None,
+                            mime_type="video/mp4")
+    add_box(s, vl, vt + vh + Inches(0.04), vw, Inches(0.001), WHITE)
+    b, tf = textbox(s, vl, vt + vh + Inches(0.06), vw, Inches(0.32))
+    para(tf, "3 s clip \u2014 click to play in Slide Show mode", 11.5, False, MUTED,
+         PP_ALIGN.CENTER, first=True, space_after=0)
+
+    rx = vl + vw + Inches(0.35)
+    rw = Inches(13.333) - rx - Inches(0.35)
+    add_round(s, rx, Inches(1.15), rw, Inches(5.3), LIGHT)
+    b, tf = textbox(s, rx + Inches(0.22), Inches(1.28), rw - Inches(0.44), Inches(5.05))
+    para(tf, "One new term", 16, True, NAVY, first=True, space_after=6)
+    mathpara(tf, [T("F"), T("rep", sub=True), T(" = k"), T("rep", sub=True),
+                  T(" \u222b \u03c6"), T("1", sub=True), T("2", sup=True),
+                  T(" \u03c6"), T("2", sub=True), T("2", sup=True)],
+             size=16, color=NAVY, align=PP_ALIGN.LEFT, space_after=8)
+    para(tf, "Costs energy only where both cells' \u03c6 are "
+              "simultaneously \u2248 1 \u2014 i.e. right at contact. "
+              "Adds one line, 2k\u1d63\u2091\u209a\u03c6\u1d62\u03c6\u2c7c\u00b2, to each "
+              "cell's own \u03bc\u1d62. Everything else \u2014 the Darcy law, the "
+              "P equation \u2014 is untouched: still local, still no global "
+              "solve.", 13, False, DARK, space_after=12)
+    para(tf, "First experiment: a glancing collision", 15, True, TEAL,
+         space_after=6)
+    bullet(tf, "\u2022  Cells offset in y, polarised toward each other", 12.5, DARK, space_after=4)
+    bullet(tf, "\u2022  Approach \u2192 brief contact \u2192 clean scatter apart", 12.5, DARK, space_after=4)
+    bullet(tf, "\u2022  Contact overlap peaks at 2.1, well under the "
+                "8.7 a non-interacting pair would show at nominal touching",
+           12.5, DARK, space_after=4)
+    bullet(tf, "\u2022  No merging, no numerical blow-up, healthy interiors throughout",
+           12.5, DARK, space_after=10)
+    para(tf, "Head-on collisions (both cells pointed straight at each "
+              "other) are a harder, still-open case \u2014 noted honestly, "
+              "not hidden.", 12, False, MUTED, space_after=0, line_spacing=1.05)
+
+    notes(s, "This is not a finished result, it is evidence that the "
+              "extension to many cells works mechanically. Two cells, "
+              "each running the exact single-cell Version 4 equations, "
+              "coupled by one new steric repulsion term in the free "
+              "energy. A glancing collision shows a clean approach, "
+              "contact, and scatter, with no merging and no global "
+              "solve required. Head-on collisions are harder and are "
+              "flagged as the next thing to get right.")
+
+
 # --------------------------------------------------------------- slide 7 --
 
 def slide_learn(prs):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     add_box(s, Inches(0), Inches(0), Inches(13.333), Inches(7.5), WHITE)
     header_bar(s, "What the simulations establish")
-    footer(s, 8, n=9)
+    footer(s, 9, n=10)
 
     items = [
         ("01", "A spatial gradient in treadmilling can generate a leading protrusion.",
@@ -887,7 +949,7 @@ def slide_next(prs):
     s = prs.slides.add_slide(prs.slide_layouts[6])
     add_box(s, Inches(0), Inches(0), Inches(13.333), Inches(7.5), WHITE)
     header_bar(s, "From one cell to many")
-    footer(s, 9, n=9)
+    footer(s, 10, n=10)
 
     items = [
         ("1", "Two cells", "One field pair per cell + repulsive overlap."),
@@ -929,6 +991,7 @@ def main():
     slide_v12(prs)
     slide_v3(prs)
     slide_v4(prs)
+    slide_two_cell(prs)
     slide_learn(prs)
     slide_next(prs)
     prs.save(OUT)
