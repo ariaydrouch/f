@@ -10,6 +10,7 @@ The project is built up in deliberately small, testable versions.
 |---|---|---|
 | `BTP_version1.ipynb` | Cell field $\phi$ in free space, actin polarization $\mathbf P$, active treadmilling $w_0\mathbf P$ | cell translates rigidly; area drifts by ~4.5% |
 | `BTP_version2.ipynb` | Wall geometry, treadmilling confined near the substrate, exactly conserved volume, viscous screening in place of a flow solver | **protrusion + steady crawling, volume conserved to $10^{-16}$** |
+| `BTP_two_cell.ipynb` | Two independent $(\phi_i,\mathbf P_i)$ pairs on one shared grid, friction-dominated (Darcy) force balance, one new steric-repulsion term coupling the cells | **first two-cell experiment: a clean glancing collision — approach, brief contact, scatter apart, no merging** |
 
 ## Version 2 at a glance
 
@@ -47,6 +48,43 @@ jupyter notebook BTP_version2.ipynb
 The notebook ships with outputs. A full re-run takes about 8 minutes on 1 core;
 most of that is the two parameter sweeps, which can be shortened by lowering
 `t_final`.
+
+## Two cells: `BTP_two_cell.ipynb`
+
+The first step towards many interacting cells. Each cell keeps its own
+$\phi_i,\mathbf P_i$ and its own friction-dominated Darcy law
+$\mathbf v_i=-( \zeta/\xi)\nabla\cdot(\phi_i\mathbf P_i\mathbf P_i)$,
+$\mathbf u_i=\mathbf v_i+w_0\mathbf P_i$ — the same physics as the
+single-cell Version 4 model. The two cells are coupled through exactly
+one new term in the free energy,
+
+$$F_{\rm rep}=k_{\rm rep}\int\phi_1^2\phi_2^2\,dr,$$
+
+a quartic steric-exclusion penalty that only costs energy where both
+fields are simultaneously $\mathcal O(1)$ (i.e. right at contact).
+Differentiating it adds a single term, $2k_{\rm rep}\phi_i\phi_j^2$, to
+each cell's own chemical potential $\mu_i$ and nothing else — the
+Darcy velocity law and the polarization equation keep their
+single-cell form, so the model stays local (no global solve) with two
+cells, exactly as it did with one.
+
+The notebook's first experiment is a **glancing collision**:
+two cells, offset in $y$ by less than their diameter, polarized
+toward each other along $x$. At $k_{\rm rep}=30$ the run is
+well-behaved over the whole trajectory: the cells approach, briefly
+touch (contact overlap peaking at $\approx2.1$, well under the
+$\approx8.7$ a non-interacting pair would show at nominal contact),
+and then scatter cleanly apart with healthy, un-collapsed interiors.
+`two_cell_media/two_cell_collision.mp4` is a 3-second clip of the full
+run (approach $\to$ contact $\to$ scatter).
+
+A head-on collision (both cells' $\mathbf P$ pointing directly at one
+another) was tried first and is a harder test: moderate $k_{\rm rep}$
+let the pair interpenetrate badly, and a much larger $k_{\rm rep}$
+stabilised a clean non-overlapping contact in the short term but the
+compressed interface kept elongating over long runs until it wrapped
+around the periodic domain. That regime is flagged as unfinished
+business, not swept under the rug.
 
 ## Known limitation, and Version 3
 
