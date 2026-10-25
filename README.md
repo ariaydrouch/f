@@ -14,6 +14,7 @@ The project is built up in deliberately small, testable versions.
 | `BTP_version1.ipynb` | free space, top view | $\phi$, $\mathbf P$, treadmilling $w_0\mathbf P$ | cell translates rigidly; area drifts 4.5% |
 | `BTP_version2.ipynb` | side view, wall at $z=0$ | near-wall treadmilling $w(z)$, exact volume, viscous screening | **protrusion + steady crawling** |
 | `BTP_version3.ipynb` | top view, substrate friction | **full model: Stokes flow, active stress, Frank/elastic stress, vorticity, flow alignment, anchoring, adhesion** | **cell morphologies: aster, lamellipodium, cup** |
+| `BTP_version3_run_and_tumble.ipynb` | same physics as Version 3 | a decision layer: pick a random direction, deform and crawl that way for a (random) distance, switch activity off and relax back to a circle, repeat | **stop-and-go migration with repeated repolarisation** |
 
 Versions 2 and 3 are complementary rather than sequential: the protrusion of
 Fig. 1 of the paper is a *near-substrate* structure and needs the side view,
@@ -113,6 +114,35 @@ run will be compared against. **It is appended but not executed**: run it
 yourself (needs `ffmpeg` on the `PATH`; full Stokes at $N=128$ costs about
 $2.7\,\mathrm{ms}$/step, so the ~15 000-step run plus encoding should take
 well under a minute).
+
+## A cell that decides, moves, and resets: `BTP_version3_run_and_tumble.ipynb`
+
+Every result above hands the cell one polarization at $t=0$ and lets it
+crawl in whatever direction that implies for the whole run. This notebook
+adds a decision layer on top of the *exact same* Version 3 mechanics
+(copied over unchanged — grid, thermodynamics, body force, Stokes solve,
+diagnostics):
+
+1. **Decide.** Draw a random direction $\theta\sim U(0,2\pi)$ and a random
+   travel distance (a fixed distance also works — pass `distance_range=(d,d)`).
+2. **Deform and move.** Point $\mathbf P$ along $\theta$ with the usual
+   lamellipodium activity ($w_0=1,\ \zeta=-1,\ \beta=0.25$) switched on;
+   the cell polarises into its motile fan shape and crawls that way.
+3. **Relax.** Once it has travelled the chosen distance, switch
+   $\zeta,\beta,w_0$ off. With no energy sustaining the fan, the same
+   interfacial relaxation validated in Version 3's passive-limit test
+   (Section 13) pulls the cell back towards a circle; the phase ends once
+   circularity clears a target (capped so it can't stall forever).
+4. **Repeat** for `n_cycles`, each leg starting fresh from the relaxed
+   shape with a new, independent direction.
+
+Produces a path plot (coloured by phase), the usual aspect-ratio /
+circularity diagnostics, and `run_and_tumble.mp4` — a video of the whole
+decide → fan out → crawl → round off → decide-again cycle.
+
+**Not executed in this repository** — run it yourself (four cycles at the
+default settings is on the order of $35$–$45$ thousand steps, roughly
+$1.5$–$2$ minutes at Version 3's $\approx2.7\,\mathrm{ms}$/step).
 
 ## Next steps
 
