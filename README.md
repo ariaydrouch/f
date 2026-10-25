@@ -96,11 +96,33 @@ All notebooks ship with outputs. Version 3 takes about 20 minutes to re-run on
 one core, most of it in the two parameter sweeps; set `QUICK = True` in the
 parameters cell to shrink every run while developing.
 
+### Section 19 — single-cell video, and why Version 3 (not 4) for many cells
+
+A separate Version 4 (local, friction-dominated Darcy law in place of the
+Stokes solve) was built to make many-cell runs cheap, and a first two-cell
+experiment was done on top of it. The adviser's guidance was to extend
+**Version 3** instead for multi-cell work: viscosity is exactly how one
+cell's motion is felt by a colliding neighbour through the shared flow
+field, and the local Darcy law throws that coupling away by construction.
+
+Section 19, appended at the end of `BTP_version3.ipynb`, runs the
+"lamellipodium" morphology for $t=150$ with a snapshot every time unit and
+renders them into a short video (`version3_single_cell.mp4`, 150 frames at
+30 fps = 5 s) — the single-cell baseline the upcoming two-cell *Version 3*
+run will be compared against. **It is appended but not executed**: run it
+yourself (needs `ffmpeg` on the `PATH`; full Stokes at $N=128$ costs about
+$2.7\,\mathrm{ms}$/step, so the ~15 000-step run plus encoding should take
+well under a minute).
+
 ## Next steps
 
-Mechanosensitive adhesion $\xi(|\mathbf v|)$ with a cycle in the activity, to
-test the Leoni & Sens biphasic prediction inside a continuum model; spontaneous
-polarity so the cell chooses its own direction instead of being handed a uniform
-or radial $\mathbf P$; coupling the Version 2 slice to the Version 3 solver to
-get the pseudopod and the cell shapes in one calculation; and two phase fields
-for cell–cell interaction.
+Two phase fields, $\phi_1,\mathbf P_1$ and $\phi_2,\mathbf P_2$, sharing one
+Stokes solve: `stokes_solve` sees the combined body force
+$\mathbf f_1+\mathbf f_2$ and returns one $\mathbf v$ felt by both cells,
+with the same steric-repulsion term, $F_{\rm rep}=k_{\rm rep}\int\phi_1^2\phi_2^2$,
+used in the Version 4 two-cell experiment. After that: mechanosensitive
+adhesion $\xi(|\mathbf v|)$ with a cycle in the activity, to test the Leoni
+& Sens biphasic prediction; spontaneous polarity so a cell chooses its own
+direction instead of being handed a uniform or radial $\mathbf P$; and
+coupling the Version 2 slice to the Version 3 solver to get the pseudopod
+and the top-view cell shapes in one calculation.
