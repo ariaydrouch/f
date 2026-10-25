@@ -15,6 +15,7 @@ The project is built up in deliberately small, testable versions.
 | `BTP_version2.ipynb` | side view, wall at $z=0$ | near-wall treadmilling $w(z)$, exact volume, viscous screening | **protrusion + steady crawling** |
 | `BTP_version3.ipynb` | top view, substrate friction | **full model: Stokes flow, active stress, Frank/elastic stress, vorticity, flow alignment, anchoring, adhesion** | **cell morphologies: aster, lamellipodium, cup** |
 | `BTP_version3_run_and_tumble.ipynb` | same physics as Version 3 | a decision layer: pick a random direction, deform and crawl that way for a (random) distance, switch activity off and relax back to a circle, repeat | **stop-and-go migration with repeated repolarisation** |
+| `BTP_version3_two_cell_walk.ipynb` | same physics, closed box (soft walls, not periodic) | two cells each running their own decide/move/relax walk, merging into one on contact | **collision → coalescence → momentum-biased redirect** |
 
 Versions 2 and 3 are complementary rather than sequential: the protrusion of
 Fig. 1 of the paper is a *near-substrate* structure and needs the side view,
@@ -143,6 +144,59 @@ decide → fan out → crawl → round off → decide-again cycle.
 **Not executed in this repository** — run it yourself (four cycles at the
 default settings is on the order of $35$–$45$ thousand steps, roughly
 $1.5$–$2$ minutes at Version 3's $\approx2.7\,\mathrm{ms}$/step).
+
+## Two cells, one closed box, merging: `BTP_version3_two_cell_walk.ipynb`
+
+Two independent walkers from the run-and-tumble notebook, sharing one
+box, that coalesce instead of repelling when their paths cross. Three
+decisions, with the reasoning behind each:
+
+- **One shared $\phi,\mathbf P$ field, not two.** The Version 4 two-cell
+  experiment used two *separate* phase fields specifically so the cells
+  would stay distinguishable and needed a steric term to stop them
+  overlapping. Here we want the opposite — seed two disjoint blobs in
+  one field, and ordinary interfacial tension (the same physics
+  validated in Version 3's passive-limit test) merges them on contact
+  with no extra code. That is what "mix into one another" means for a
+  diffuse-interface model.
+- **A closed box, as a soft wall rather than a new solver.** The
+  spectral Stokes solve is only valid on a periodic domain; properly
+  replacing it with wall boundary conditions means a real rewrite
+  (finite differences/volumes, a sparse linear solve instead of two
+  FFTs). Instead, one new term is added to $\mu_\phi$ — a potential
+  that ramps up near the domain edges and pushes $\phi$ back inward,
+  the same trick as Version 4's steric-repulsion term but against a
+  static wall field. Flagged clearly as an approximation, not a literal
+  no-slip wall.
+- **"Angular momentum conservation" reinterpreted for an inertia-free
+  model.** Stokes flow drops inertia entirely ($Re\sim10^{-5}$), so
+  momentum is not carried forward in time — force and torque on the
+  fluid balance *instantaneously*, dissipated by viscosity and
+  substrate friction every step. There is no literal conserved quantity
+  to carry across a collision. What the notebook does instead: just
+  before the two blobs touch, it computes the linear and angular
+  momentum each carries from its own crawling motion
+  ($\mathbf p_i=m_i\mathbf v_i$, $L_i=m_i(\mathbf r_i-\mathbf
+  R_{\rm cm})\times\mathbf v_i$) and uses the combined $\mathbf
+  p_{\rm tot}$ to **bias** — via a von Mises distribution, not a
+  constraint — the merged cell's next randomly chosen heading.
+  $L_{\rm tot}$ is reported as a diagnostic. This treats the
+  pre-collision state as information feeding a stochastic decision,
+  rather than a dynamical law the equations don't actually have.
+
+A cell also redirects (new random heading, biased back toward the
+centre) if it drifts into the wall margin, on top of the usual
+distance-reached and relaxed-long-enough triggers from the single-cell
+run-and-tumble notebook.
+
+Produces a path plot (two colours before the merge, one after, with the
+merge point marked), and `two_cell_walk.mp4`.
+
+**Not executed** — same reasoning and the same verification (syntax
+check + a clean `pyflakes` pass) as the previous two additions. $N=192$
+(bigger box, two cells) costs roughly $2$–$2.5\times$ per step versus
+the single-cell grid; a $400$-time-unit run is a reasoned estimate of
+$4$–$5$ minutes, not a measured one.
 
 ## Next steps
 
