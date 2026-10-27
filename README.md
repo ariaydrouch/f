@@ -198,6 +198,12 @@ check + a clean `pyflakes` pass) as the previous two additions. $N=192$
 the single-cell grid; a $400$-time-unit run is a reasoned estimate of
 $4$–$5$ minutes, not a measured one.
 
+A standalone writeup of the physics and mechanics behind this
+notebook — what Version 3's equations are, exactly what changed and
+why, and what the (not-yet-measured) diagnostics are designed to show
+— is in [`docs/two_cell_walk_physics.pdf`](docs/two_cell_walk_physics.pdf)
+(source: `docs/two_cell_walk_physics.tex`).
+
 ## Next steps
 
 Two phase fields, $\phi_1,\mathbf P_1$ and $\phi_2,\mathbf P_2$, sharing one

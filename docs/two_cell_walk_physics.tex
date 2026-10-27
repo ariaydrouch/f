@@ -1,0 +1,509 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue}
+
+\newcommand{\bP}{\mathbf{P}}
+\newcommand{\bv}{\mathbf{v}}
+\newcommand{\bu}{\mathbf{u}}
+\newcommand{\bh}{\mathbf{h}}
+\newcommand{\br}{\mathbf{r}}
+\newcommand{\bp}{\mathbf{p}}
+\newcommand{\bR}{\mathbf{R}}
+
+\title{\textbf{Two Cells, One Closed Box, Merging}\\
+\large Physics, Mechanics, and What Changed from Version 3}
+\author{BTP — Phase-Field Modelling of Crawling Cells}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+This note documents the physics and the control logic implemented in
+\texttt{BTP\_version3\_two\_cell\_walk.ipynb}: two independently
+crawling cells, each repeatedly choosing a direction, deforming to
+move that way, relaxing back towards a circle, and choosing again,
+confined to a closed box, that coalesce into one cell when their
+paths cross. The underlying continuum model is exactly Version 3's
+full phase-field / active-polar-fluid description with a spectral
+Stokes solve; this note is organised around \emph{what changed} to
+produce the new behaviour, and why each change was made the way it
+was. \textbf{The notebook has not been executed as of this writing};
+Section~\ref{sec:results} describes the designed, expected behaviour
+and the diagnostics the code will produce, not measured output, and
+says so explicitly wherever a number would otherwise look like a
+result.
+\end{abstract}
+
+\tableofcontents
+
+%======================================================================
+\section{Scope and an upfront caveat}
+%======================================================================
+
+\texttt{BTP\_version3\_two\_cell\_walk.ipynb} was written and
+statically checked (every cell compiles; a \texttt{pyflakes} pass
+returns no warnings) but \textbf{deliberately not run}, per the
+project owner's request to execute new code on their own machine.
+Consequently this note cannot report measured speeds, merge times, or
+rendered figures. What it \emph{can} do, and what it does below, is
+explain precisely what the model computes, why each new mechanism was
+added, how it differs from Version 3 and from the earlier Version 4
+two-cell experiment, and what the diagnostics are designed to show
+once the notebook is run. Every quantitative parameter below (box
+size, wall strength, relaxation time, distance ranges) is a
+\emph{chosen input}, not a fitted or verified one.
+
+%======================================================================
+\section{Recap: the Version 3 physics, unchanged}
+\label{sec:v3recap}
+%======================================================================
+
+The two-cell notebook keeps the entire single-cell Version 3 model
+intact; nothing in this section was modified. It is restated here
+because every later section refers back to these equations by name.
+
+\subsection{Fields}
+A cell is a diffuse phase field $\phi(x,y,t)$, equal to $1$ inside the
+cell and $0$ outside, with a smooth interface of width set by
+$\varepsilon$. The actin cytoskeleton's local orientation and
+polymerisation activity is a vector field $\bP(x,y,t)$, non-zero only
+where $\phi>0$. The cytoplasm's velocity is $\bv(x,y,t)$, obtained at
+every instant from a force balance (not integrated forward in time —
+see Section~\ref{sec:nointertia}).
+
+\subsection{Free energy}
+Following Tjhung, Tiribocchi, Marenduzzo and Cates~\cite{Tjhung2015},
+\begin{equation}
+F[\phi,\bP] = \int d^2r\;\Big\{
+\underbrace{a\,\phi^2(\phi-1)^2}_{\text{double well}}
++\underbrace{\tfrac{\varepsilon^2}{2}|\nabla\phi|^2}_{\text{interfacial tension}}
+-\underbrace{\tfrac{\alpha}{2}(2\phi-1)|\bP|^2+\tfrac{\alpha}{4}|\bP|^4}_{\text{polar order inside the cell}}
++\underbrace{\tfrac{\kappa}{2}(\nabla\bP)^2}_{\text{Frank elasticity}}
++\underbrace{\beta\,\bP\cdot\nabla\phi}_{\text{anchoring}}
+\Big\}.
+\label{eq:F}
+\end{equation}
+The double well plus the interfacial term give the cell a boundary
+with a cost; the $\alpha$ terms drive $|\bP|^2\to2\phi-1$ strictly
+inside the cell; the Frank term penalises sharp turns in $\bP$; and
+the anchoring term, with $\beta>0$, makes $\bP$ prefer to point
+outward, normal to the local boundary — in every version of this
+project, $\beta$ has been the dominant shape parameter.
+
+Differentiating gives the chemical potential driving $\phi$ and the
+molecular field driving $\bP$:
+\begin{align}
+\mu_\phi &= \frac{\delta F}{\delta\phi}
+= 2a\,\phi(\phi-1)(2\phi-1) - \varepsilon^2\nabla^2\phi - \alpha|\bP|^2 - \beta\,\nabla\!\cdot\!\bP,
+\label{eq:mu}\\
+\bh &= \frac{\delta F}{\delta\bP}
+= \big[-\alpha(2\phi-1)+\alpha|\bP|^2\big]\bP - \kappa\nabla^2\bP + \beta\nabla\phi.
+\label{eq:h}
+\end{align}
+
+\subsection{Equations of motion}
+With $\bu=\bv+w_0\bP$ the net velocity transporting cell material
+($w_0$ the actin treadmilling rate),
+\begin{align}
+\partial_t\phi + \nabla\!\cdot\!(\phi\,\bu) &= -M\big[\mu_\phi-\Lambda\,g(\phi)\big],
+\qquad g(\phi)=\phi(1-\phi),
+\label{eq:phidot}\\
+\partial_t\bP + (\bu\cdot\nabla)\bP &= -\boldsymbol\Omega\cdot\bP + \chi\,\mathbf D\cdot\bP - \bh/\Gamma,
+\label{eq:Pdot}
+\end{align}
+where $\mathbf D$ and $\boldsymbol\Omega$ are the symmetric
+(strain-rate) and antisymmetric (vorticity) parts of
+$\partial_\alpha v_\beta$, $\Gamma$ a rotational viscosity, and
+$\chi$ the flow-alignment parameter. $\Lambda$ is a spatially uniform
+Lagrange multiplier, $\Lambda=\int\mu_\phi\,dA/\int g\,dA$, which makes
+Eq.~\eqref{eq:phidot} conserve $\int\phi\,dA$ \emph{exactly}, to
+machine precision, by construction — this is the
+Rubinstein--Sternberg conservative form of Allen--Cahn
+dynamics~\cite{Rubinstein1992}, not an approximate correction.
+
+\subsection{Force balance}
+At the cell's scale $Re\sim10^{-5}$, so inertia is dropped and the
+force balance is the Stokes limit,
+\begin{equation}
+0 = -\nabla p + \eta\nabla^2\bv - \xi\bv + \mathbf f,
+\qquad \nabla\!\cdot\!\bv = 0,
+\label{eq:stokes}
+\end{equation}
+with the substrate contribution $-\xi\bv$ standing in for the wall of
+the original 3D geometry (the continuum limit of a carpet of
+stochastic adhesive linkers~\cite{LeoniSens2017}), and the body force
+\begin{equation}
+f_\alpha = \partial_\beta\!\big(\sigma^{\rm act}_{\alpha\beta}+\sigma^{\rm el}_{\alpha\beta}\big) - \phi\,\partial_\alpha\mu_\phi,
+\qquad
+\sigma^{\rm act}_{\alpha\beta} = -\zeta\,\phi\,P_\alpha P_\beta,
+\label{eq:force}
+\end{equation}
+$\zeta<0$ contractile, $\sigma^{\rm el}$ the elastic (Frank $+$
+co-rotational) stress, and the last term of Eq.~\eqref{eq:force} the
+capillary force in potential form.
+
+\subsection{The spectral solve}
+Because the domain is periodic, Eq.~\eqref{eq:stokes} is solved
+exactly in Fourier space: a Leray (transverse) projection eliminates
+the pressure, and dividing by $\xi+\eta k^2$ gives $\hat{\bv}(\mathbf
+k)$ directly — one pair of FFTs per step, no iteration, no time-step
+restriction from the viscous term. \textbf{This spectral method is
+the one piece of Version 3's numerics that only works because the
+domain is periodic}, a fact Section~\ref{sec:wall} returns to.
+
+%======================================================================
+\section{What changed: from one cell to two, in a closed box}
+\label{sec:changes}
+%======================================================================
+
+Table~\ref{tab:changes} gives the short version; the rest of this
+section explains each row.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}p{3.6cm}p{5.6cm}p{5.6cm}@{}}
+\hline
+& \textbf{Version 3 (single cell)} & \textbf{Two-cell walk notebook} \\
+\hline
+Grid & $N{=}128$, $L{=}80$ & $N{=}192$, $L{=}120$ (room for two cells and a walk) \\
+Domain & periodic, infinite in effect & periodic numerically, but confined by a new soft wall term \\
+Phase/polarization fields & one $\phi$, one $\bP$, one cell & one $\phi$, one $\bP$, \emph{two disjoint blobs} at $t{=}0$ \\
+Activity ($w_0,\zeta,\beta$) & uniform scalars, on for the whole run & $w_0$ becomes a \emph{field} (array); each blob's region is independently on/off \\
+Direction of $\bP$ & set once at $t{=}0$, implicit in the initial condition & chosen explicitly, re-chosen on a schedule, per blob \\
+What stops the cell at the edge & nothing (recentring trick keeps one cell near the middle) & the new wall potential (no recentring; absolute position matters) \\
+Two cells touching & not modelled & coalesce into one connected $\phi$ region, detected via connected-component labelling \\
+Post-collision direction & n/a & biased towards the two cells' combined pre-collision momentum \\
+\hline
+\end{tabular}
+\caption{What changed, at a glance.}
+\label{tab:changes}
+\end{table}
+
+\subsection{Grid and domain}
+The grid grew from $128\times128$ ($L=80$) to $192\times192$
+($L=120$) at the same resolution $dx=0.625$. Two cells need room to
+start apart, walk, and potentially collide without ever nearing the
+box edge closely enough for the soft wall (Section~\ref{sec:wall}) to
+distort their shape before a genuine wall-avoidance decision should
+fire.
+
+\subsection{The soft confining wall}
+\label{sec:wall}
+Version 3's Stokes solve is spectral, which requires periodicity;
+there is no way to impose a literal no-slip or free-slip wall inside
+that method without replacing it with a different linear solve
+(finite differences or finite volumes, discretising
+Eq.~\eqref{eq:stokes} with wall boundary conditions and solving the
+resulting sparse system — a substantial rewrite, not attempted here).
+Instead, exactly \emph{one} new term is added to the chemical
+potential of Eq.~\eqref{eq:mu}:
+\begin{equation}
+\mu_\phi \;\longrightarrow\; \mu_\phi + k_{\rm wall}\,W(x,y)\,\phi,
+\qquad
+W(x,y) = \left[\frac{\max\!\big(0,\,|x|-x_0\big)^2+\max\!\big(0,\,|y|-y_0\big)^2}{(L/2-x_0)^2}\right]^{1/2\cdot{\rm sharp}},
+\label{eq:wall}
+\end{equation}
+precomputed once as a static array $W$: zero everywhere inside a
+square region starting at $x_0=y_0=0.8\times(L/2)$ from the centre,
+rising smoothly (quartic by default, set by \texttt{wall\_sharpness})
+to $1$ at the literal domain edge. This is structurally the
+\emph{same kind of term} as the pairwise steric-repulsion used in the
+Version 4 two-cell experiment ($+2k_{\rm rep}\phi_i\phi_j^2$ in each
+cell's $\mu_i$) — a quartic penalty that only activates where $\phi$
+overlaps a forbidden region — except the forbidden region here is a
+fixed wall field $W$ instead of another cell's $\phi_j$. It plugs into
+the unmodified relaxation term of Eq.~\eqref{eq:phidot} with no other
+code change.
+
+\paragraph{What this is not.} It is a soft potential, not a boundary
+condition. The fluid velocity field $\bv$ is still computed on a
+periodic domain; what changes is that $\phi$ is discouraged, by an
+energy penalty, from occupying the near-edge zone, which behaviourally
+keeps the cell inside a confined region without literally terminating
+the computational domain there. The strength $k_{\rm wall}=40$ and the
+margin $0.8\times(L/2)$ are \emph{reasoned starting values}: they were
+chosen by the same reasoning used for the Version 4 repulsion
+coefficient (large enough, relative to the double-well coefficient
+$a$, to resist the active crawling force pushing against it) but were
+not empirically tuned by running this notebook. A runtime check
+(\texttt{touches\_boundary}) prints a warning if $\phi>0.5$ ever
+reaches within six grid cells of the literal array edge, which would
+indicate $k_{\rm wall}$ needs to be raised.
+
+\subsection{Two blobs, one field}
+\label{sec:oneField}
+The Version 4 two-cell experiment (a separate, earlier notebook) used
+\emph{two separate} fields, $\phi_1,\bP_1$ and $\phi_2,\bP_2$, coupled
+by a steric term specifically so the cells would stay distinguishable
+and never overlap. This notebook does the opposite on purpose: it
+uses \emph{one} $\phi$ and \emph{one} $\bP$, initialised with two
+disjoint tanh profiles,
+\begin{equation}
+\phi(\br,0) = \max\Big(\tfrac12\big[1-\tanh(\tfrac{|\br-\br_1|-R_0}{\sqrt2\,\varepsilon})\big],\;
+\tfrac12\big[1-\tanh(\tfrac{|\br-\br_2|-R_0}{\sqrt2\,\varepsilon})\big]\Big),
+\end{equation}
+and $\bP$ set independently within each blob's own disc to point
+along that blob's chosen heading. While the two regions of $\phi>0$
+are disjoint, nothing distinguishes them as separate objects to the
+underlying PDE — Eqs.~\eqref{eq:phidot}--\eqref{eq:Pdot} are evaluated
+over the whole grid every step, exactly as they are for one cell.
+When the two regions' boundaries touch, the double-well and
+interfacial-tension terms of Eq.~\eqref{eq:F} do what they always do:
+minimise interfacial length, which for two adjacent blobs of the
+\emph{same} field means rounding the pair into one connected shape.
+\textbf{No merging algorithm was written}; coalescence is a direct
+consequence of using one shared field, which is the most literal
+reading of ``mix into one another'' available in a diffuse-interface
+model — once the interface between them disappears, there is no
+record left of which material came from which original cell.
+
+\subsection{Activity as a field, not a scalar}
+Before the two blobs merge, one of them may be actively crawling
+(treadmilling, anchoring, active stress all switched on) while the
+other is relaxing (all switched off), simultaneously, in the same
+field. This requires only one structural change: $w_0$, previously a
+single scalar multiplying $\bP$ in $\bu=\bv+w_0\bP$, becomes a
+spatial array $w_0(x,y)$, equal to the active value inside whichever
+blob is currently in its ``move'' phase and zero elsewhere (including
+inside a blob that is relaxing). $\zeta$ and $\beta$ needed no such
+change: they already appear multiplying other fields elementwise in
+Eqs.~\eqref{eq:mu}--\eqref{eq:force}
+(\texttt{chemical\_potential\_phi}, \texttt{molecular\_field\_P},
+\texttt{body\_force}), so passing them in as arrays instead of scalars
+works with the existing code unmodified — only the
+function signature and the one line computing $\bu$ needed to accept
+a field for $w_0$.
+
+\subsection{The decision layer}
+\label{sec:decision}
+Each disjoint blob (and, after merging, the single resulting cell)
+carries a small state: a current heading $\theta$, a phase (\emph{move}
+or \emph{relax}), a target travel distance for the current move leg,
+and the position where that leg began. Every \texttt{sample\_every}
+steps ($=1$ time unit at $dt=0.01$), three conditions are checked, in
+priority order:
+\begin{enumerate}
+\item \textbf{Near a wall.} If the blob's centroid is within
+\texttt{wall\_redirect\_margin} of the box edge, pick a new heading
+biased back toward the box centre (a von Mises draw centred on
+$\arctan2(-y,-x)$, concentration \texttt{wall\_kappa}) and start a new
+move leg immediately.
+\item \textbf{Move leg finished.} If the blob is in \emph{move} phase
+and has covered its target distance, switch to \emph{relax}: $w_0$,
+$\zeta$, $\beta$ all set to zero within its mask. With no energy
+sustaining the fan shape, Eq.~\eqref{eq:phidot}'s relaxation term
+— the same interfacial relaxation validated in Version 3's
+passive-limit test, an ellipse relaxing to a circle — pulls the blob
+back towards a circle on its own; nothing new was added for this.
+\item \textbf{Relax finished.} If the blob has been relaxing for at
+least \texttt{relax\_time}, pick a fresh, uniformly random heading
+and resume \emph{move}.
+\end{enumerate}
+Identifying which blob is which between checks uses
+\texttt{scipy.ndimage.label} on $\phi>0.5$ to find connected
+components, matched to the previous check's two tracked blobs by
+whichever pairing minimises total centroid displacement — this keeps
+a blob's identity (and hence its in-progress target distance and
+heading) stable across checks even though the labelling algorithm
+itself has no memory of which numbered label is which cell.
+
+\subsection{The merge event}
+\label{sec:merge}
+The moment \texttt{ndimage.label} reports \textbf{one} connected
+component where it previously reported two, the merge branch fires
+exactly once. Using the \emph{last} check before contact (where the
+two blobs were still separately resolvable), it computes each blob's
+mass-like weight $m_i=\int_{\Omega_i}\phi\,dA$, its instantaneous
+crawling velocity $\bv_i$ (centroid displacement over the preceding
+check interval, divided by the elapsed time), and from these:
+\begin{align}
+\bp_i &= m_i\,\bv_i, &
+\bp_{\rm tot} &= \bp_1+\bp_2,\\
+\bR_{\rm cm} &= \frac{m_1\br_1+m_2\br_2}{m_1+m_2}, &
+L_i &= m_i\,(\br_i-\bR_{\rm cm})\times\bv_i,
+\qquad L_{\rm tot}=L_1+L_2.
+\label{eq:momentum}
+\end{align}
+$L_i$ is the $z$-component of the orbital angular momentum each
+blob's crawling motion carries about the eventual contact point —
+exactly the quantity this project's adviser asked to be taken into
+account. Section~\ref{sec:nointertia} explains why it is used as a
+\emph{bias}, via a von Mises distribution centred on
+$\arctan2(p_{{\rm tot},y},p_{{\rm tot},x})$ with concentration
+\texttt{merge\_kappa}, for the merged cell's first new heading —
+rather than enforced as a literal conserved quantity. $\bp_{\rm tot}$
+and $L_{\rm tot}$ are both printed when the merge fires, as a
+diagnostic record of what the pre-collision state implied, whether or
+not the model's own stochastic choice ends up close to that
+direction.
+
+\subsection{Why not literal angular-momentum conservation}
+\label{sec:nointertia}
+This is worth stating plainly rather than quietly working around.
+Stokes flow (Eq.~\eqref{eq:stokes}) is the zero-Reynolds-number
+limit: inertia has been dropped from the equations entirely, which is
+also why this project has used $Re\sim10^{-5}$ to justify the force
+balance since Version 3 was first built. In that limit, momentum is
+\emph{not} a quantity carried forward in time at all — net force and
+net torque on the fluid are balanced \emph{instantaneously}, every
+step, by viscous dissipation and the substrate friction $-\xi\bv$,
+which is itself an external drag that can (and does) absorb momentum
+from outside the fluid/cell system. There is no dynamical bookkeeping
+in Eq.~\eqref{eq:stokes} analogous to $\tfrac{d}{dt}(m\bv)=0$ for an
+isolated collision, because there is no inertial term to begin with.
+This is the standard, if counter-intuitive, fact about swimming at low
+Reynolds number: a cell that stops generating active stress stops
+moving \emph{immediately}, it does not coast~\cite{Purcell1977}.
+
+The notebook therefore does not — and physically should not — enforce
+$\bp_{\rm tot}$ or $L_{\rm tot}$ as a literal post-collision
+constraint on the merged cell's velocity or rotation; nothing in
+Eq.~\eqref{eq:stokes} would support such a constraint without breaking
+the force-balance structure the whole model rests on. What it does
+instead, as described in Section~\ref{sec:merge}, is treat $\bp_{\rm
+tot}$ as \emph{information}, biasing a stochastic decision the model
+was always going to make (a new random heading) rather than
+determining it outright. This keeps faith with the physics while
+still giving the collision's approach geometry a say in what happens
+next, which is the practical substance of the adviser's suggestion.
+
+%======================================================================
+\section{Mechanics of the control loop}
+\label{sec:mechanics}
+%======================================================================
+
+Algorithmically, one iteration of the outer loop (one
+\texttt{sample\_every} interval, $\approx1$ time unit):
+\begin{enumerate}
+\item Label $\phi>0.5$ into connected components.
+\item \emph{If not yet merged and two components are found:} identify
+and match them to the two tracked states (Section~\ref{sec:decision});
+for each, evaluate the three triggers in order and, if one fires,
+update that blob's state and repoint $\bP$ within its mask
+(\texttt{set\_direction}); build the elementwise activity fields
+$\zeta_{\rm run},\beta_{\rm run},w_0$ from both blobs' current phases.
+\item \emph{If not yet merged and one component is found:} run the
+merge computation of Eq.~\eqref{eq:momentum}, collapse to a single
+tracked state with a momentum-biased new heading, repoint $\bP$ over
+the whole merged region, and report $\bp_{\rm tot},L_{\rm tot}$.
+\item \emph{If already merged:} evaluate the same three triggers for
+the single state.
+\item Advance \texttt{sample\_every} individual timesteps of
+Eqs.~\eqref{eq:phidot}--\eqref{eq:Pdot} and \eqref{eq:stokes}
+(\texttt{advance\_one\_step}), unchanged from Version 3 except that
+$w_0$ is now an array; store a video frame every
+\texttt{frame\_every} steps, and check for divergence.
+\end{enumerate}
+The loop ends when the elapsed simulated time reaches
+\texttt{t\_final}.
+
+%======================================================================
+\section{Diagnostics and expected behaviour}
+\label{sec:results}
+%======================================================================
+
+\textbf{No numbers in this section were measured — the notebook has
+not been run.} This section describes what each diagnostic is
+designed to show, and the qualitative behaviour the design is
+intended to produce, so that a reader can judge the first real run
+against it.
+
+\begin{description}
+\item[Path plot] Each tracked entity's centroid is logged every check
+interval, tagged by identity (\texttt{0}, \texttt{1}, or
+\texttt{merged}) and phase (\emph{move} or \emph{relax}). The intended
+picture: two separate, roughly piecewise-linear trajectories (straight
+during \emph{move}, nearly stationary during \emph{relax}) that
+converge, mark a merge point, and continue as one trajectory
+thereafter — visually distinguishing ``two independent walks'' from
+``one combined walk'' without needing to inspect the field directly.
+\item[Merge report] $\bp_{\rm tot}$, $L_{\rm tot}$, and the resulting
+new heading, printed once. If the two cells approach nearly head-on
+with similar masses, $\bp_{\rm tot}$ should be small and the new
+heading close to uniformly random (the von Mises bias has little to
+act on); if they approach at an angle with different masses or speeds,
+$\bp_{\rm tot}$ should point roughly along the net approach direction
+and bias the merged cell's first leg that way.
+\item[Video] \texttt{two\_cell\_walk.mp4}, titled per frame with each
+active entity's phase and (while moving) heading in degrees, intended
+to make the whole decide/move/relax/redirect cycle — and the moment of
+coalescence — legible without reading the printed log alongside it.
+\item[Boundary warning] \texttt{touches\_boundary} should \emph{not}
+fire during a normal run; if it does, $k_{\rm wall}$ or the wall
+margin need to be increased (Section~\ref{sec:wall}).
+\end{description}
+
+\paragraph{Expected qualitative sequence.} Two blobs, placed
+$\texttt{init\_separation}=50$ apart along $x$, each independently
+cycle through move/relax legs of random length drawn from
+$(15,35)$ and random heading, inside a box of half-width $60$ with
+the wall zone beginning at $48$. Given random, independent headings,
+whether and when the two paths cross is itself random — for a
+\texttt{t\_final}$=400$ run there is no guarantee a merge event occurs
+at all; the run should be repeated with a different \texttt{seed} or
+a larger \texttt{t\_final}/smaller \texttt{init\_separation} if it
+does not. The notebook prints an explicit message distinguishing a
+run with a merge from one without, rather than assuming one will
+happen.
+
+%======================================================================
+\section{Open questions and known limitations}
+\label{sec:limitations}
+%======================================================================
+
+\begin{itemize}
+\item \textbf{The wall is a potential, not a boundary condition}
+(Section~\ref{sec:wall}); $k_{\rm wall}$ and the margin are untuned.
+\item \textbf{Relaxation uses a fixed duration}, not the
+circularity-based criterion of the single-cell run-and-tumble
+notebook — simpler, at the cost of not actually checking the blob has
+rounded off before resuming activity.
+\item \textbf{The merge biases heading only.} A natural extension,
+not implemented, is seeding a small swirl in $\bP$ proportional to the
+sign of $L_{\rm tot}$, so the merged cell visibly starts to curve
+rather than only picking a biased straight heading.
+\item \textbf{Connected-component labelling can be confused by small
+numerical artefacts.} The code defends against spurious extra
+components by always tracking only the two largest, but has not been
+stress-tested against this failure mode by execution.
+\item \textbf{Generalising past two cells} needs the \texttt{states}
+list and the nearest-centroid matching logic generalised from $2$ to
+$N$ blobs; not attempted here.
+\item \textbf{The honest long-term fix for Section~\ref{sec:wall}} is
+a genuine non-periodic Stokes solve (a finite-difference
+Poisson/Helmholtz solve with wall boundary conditions, replacing the
+two-FFT spectral method with a sparse linear solve) rather than a soft
+potential on a periodic domain.
+\end{itemize}
+
+%======================================================================
+\begin{thebibliography}{9}
+\bibitem{Tjhung2015}
+E.~Tjhung, A.~Tiribocchi, D.~Marenduzzo, M.~E.~Cates,
+\emph{A minimal physical model captures the shapes of crawling cells},
+Nat. Commun. \textbf{6}, 5420 (2015).
+
+\bibitem{LeoniSens2017}
+M.~Leoni, P.~Sens,
+\emph{Model of cell crawling controlled by mechanosensitive adhesion},
+Phys. Rev. Lett. \textbf{118}, 228101 (2017).
+
+\bibitem{Rubinstein1992}
+J.~Rubinstein, P.~Sternberg,
+\emph{Nonlocal reaction-diffusion equations and nucleation},
+IMA J. Appl. Math. \textbf{48}, 249 (1992).
+
+\bibitem{Purcell1977}
+E.~M.~Purcell,
+\emph{Life at low Reynolds number},
+Am. J. Phys. \textbf{45}, 3 (1977).
+\end{thebibliography}
+
+\end{document}
