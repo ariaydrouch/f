@@ -183,7 +183,13 @@ genuinely new piece of mechanics:
   headings, no decision layer) confirms this directly: both mean
   polarization angles sit flat until contact, then rotate
   symmetrically, in opposite senses, the moment the overlap integral
-  turns on (measured: $-8.8°$ and $+8.8°$ over the contact window). No
+  turns on (measured: $-8.8°$ and $+8.8°$ over the contact window),
+  and it is drawn, not just tabulated: every frame now shows each
+  cell's polarization as an arrow (navy for cell 1, dark red for cell
+  2), and a dedicated short clip,
+  `two_cell_walk_media/two_cell_collision_rotation.mp4`, isolates
+  just this off-centre collision so the arrows curling into a
+  shearing pattern at the contact interface is easy to watch. No
   rigid-body elastic-collision formula was added — that would need an
   independent notion of mass and velocity this over-damped,
   inertia-free model ($Re\sim10^{-5}$) does not actually have.
@@ -205,7 +211,7 @@ produced $3$ collision events, a maximum contact overlap of $2.07$
 touching — confirmed, not assumed), and a clean path plot showing
 both cells visibly deflect at contact rather than cross straight
 through each other. `two_cell_walk.mp4` is a 46-frame, 8 fps video of
-the whole run.
+the whole run, polarization arrows included.
 
 ## Next steps
 
