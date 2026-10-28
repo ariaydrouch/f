@@ -15,7 +15,7 @@ The project is built up in deliberately small, testable versions.
 | `BTP_version2.ipynb` | side view, wall at $z=0$ | near-wall treadmilling $w(z)$, exact volume, viscous screening | **protrusion + steady crawling** |
 | `BTP_version3.ipynb` | top view, substrate friction | **full model: Stokes flow, active stress, Frank/elastic stress, vorticity, flow alignment, anchoring, adhesion** | **cell morphologies: aster, lamellipodium, cup** |
 | `BTP_version3_run_and_tumble.ipynb` | same physics as Version 3 | a decision layer: pick a random direction, deform and crawl that way for a (random) distance, switch activity off and relax back to a circle, repeat | **stop-and-go migration with repeated repolarisation** |
-| `BTP_version3_two_cell_walk.ipynb` | same physics, closed box (soft walls, not periodic) | two cells each running their own decide/move/relax walk, merging into one on contact | **collision → coalescence → momentum-biased redirect** |
+| `BTP_version3_two_cell_walk.ipynb` | same physics, closed box (soft walls) | two cells, each running its own decide/move/relax walk, sharing one Stokes solve; a steric term keeps them from merging | **collision → deformation and mutual rotation → redirect, executed and verified** |
 
 Versions 2 and 3 are complementary rather than sequential: the protrusion of
 Fig. 1 of the paper is a *near-substrate* structure and needs the side view,
@@ -145,74 +145,73 @@ decide → fan out → crawl → round off → decide-again cycle.
 default settings is on the order of $35$–$45$ thousand steps, roughly
 $1.5$–$2$ minutes at Version 3's $\approx2.7\,\mathrm{ms}$/step).
 
-## Two cells, one closed box, merging: `BTP_version3_two_cell_walk.ipynb`
+## Two cells, a closed box, a collision that redirects: `BTP_version3_two_cell_walk.ipynb`
 
 Two independent walkers from the run-and-tumble notebook, sharing one
-box, that coalesce instead of repelling when their paths cross. Three
-decisions, with the reasoning behind each:
+closed box, that **do not merge** when their paths cross — they
+deform against each other, exchange rotation through the fluid, and
+redirect. Figures and video are in `two_cell_walk_media/`. Two new
+ingredients, both reused/adapted from earlier work, plus one
+genuinely new piece of mechanics:
 
-- **One shared $\phi,\mathbf P$ field, not two.** The Version 4 two-cell
-  experiment used two *separate* phase fields specifically so the cells
-  would stay distinguishable and needed a steric term to stop them
-  overlapping. Here we want the opposite — seed two disjoint blobs in
-  one field, and ordinary interfacial tension (the same physics
-  validated in Version 3's passive-limit test) merges them on contact
-  with no extra code. That is what "mix into one another" means for a
-  diffuse-interface model.
+- **Non-merging: the same steric term as the Version 4 two-cell
+  experiment**, $F_{\rm rep}=k_{\rm rep}\int\phi_1^2\phi_2^2$, carried
+  over unchanged (it only ever adds $2k_{\rm rep}\phi_i\phi_j^2$ to
+  each cell's own $\mu_i$).
 - **A closed box, as a soft wall rather than a new solver.** The
-  spectral Stokes solve is only valid on a periodic domain; properly
-  replacing it with wall boundary conditions means a real rewrite
-  (finite differences/volumes, a sparse linear solve instead of two
-  FFTs). Instead, one new term is added to $\mu_\phi$ — a potential
-  that ramps up near the domain edges and pushes $\phi$ back inward,
-  the same trick as Version 4's steric-repulsion term but against a
-  static wall field. Flagged clearly as an approximation, not a literal
-  no-slip wall.
-- **"Angular momentum conservation" reinterpreted for an inertia-free
-  model.** Stokes flow drops inertia entirely ($Re\sim10^{-5}$), so
-  momentum is not carried forward in time — force and torque on the
-  fluid balance *instantaneously*, dissipated by viscosity and
-  substrate friction every step. There is no literal conserved quantity
-  to carry across a collision. What the notebook does instead: just
-  before the two blobs touch, it computes the linear and angular
-  momentum each carries from its own crawling motion
-  ($\mathbf p_i=m_i\mathbf v_i$, $L_i=m_i(\mathbf r_i-\mathbf
-  R_{\rm cm})\times\mathbf v_i$) and uses the combined $\mathbf
-  p_{\rm tot}$ to **bias** — via a von Mises distribution, not a
-  constraint — the merged cell's next randomly chosen heading.
-  $L_{\rm tot}$ is reported as a diagnostic. This treats the
-  pre-collision state as information feeding a stochastic decision,
-  rather than a dynamical law the equations don't actually have.
+  spectral Stokes solve only works on a periodic domain; a literal
+  no-slip wall would need a real rewrite (finite differences/volumes,
+  a sparse linear solve instead of two FFTs). Instead, one potential
+  term is added to $\mu_\phi$ that ramps up near the domain edges —
+  **but only through the force**, not the bare relaxation. The first
+  attempt at this added it directly to the $\mu$ used by
+  $-M(\mu-\Lambda g)$, and it diverged: with no $\phi$ factor, that
+  term drains $\phi$ to $-\infty$ in empty space with nothing to stop
+  it. Keeping it out of the relaxation term and adding it only where
+  the capillary force $-\phi\,\partial_\alpha\mu$ already has a $\phi$
+  prefactor fixes this: the wall potential now does nothing away from
+  an actual cell.
+- **The genuinely new piece — one shared Stokes solve for both
+  cells.** This is the direct answer to "take momentum and rotation
+  into account": `stokes_solve` is called once on
+  $\mathbf f_1+\mathbf f_2$, returning one $\mathbf v$ felt by both
+  cells, rather than two independent flow fields that never interact.
+  Version 3's existing vorticity-driven corotation term in the
+  $\mathbf P$ equation then does the rest: if contact generates local
+  vorticity in that shared field, it torques **both** cells'
+  polarizations. A controlled check in the notebook (fixed, opposing
+  headings, no decision layer) confirms this directly: both mean
+  polarization angles sit flat until contact, then rotate
+  symmetrically, in opposite senses, the moment the overlap integral
+  turns on (measured: $-8.8°$ and $+8.8°$ over the contact window). No
+  rigid-body elastic-collision formula was added — that would need an
+  independent notion of mass and velocity this over-damped,
+  inertia-free model ($Re\sim10^{-5}$) does not actually have.
 
-A cell also redirects (new random heading, biased back toward the
-centre) if it drifts into the wall margin, on top of the usual
-distance-reached and relaxed-long-enough triggers from the single-cell
-run-and-tumble notebook.
+Each cell also redirects (ends its current "move" phase early, enters
+"relax", then picks a fresh random heading) if it drifts into the
+wall margin, or if a collision is detected (the overlap integral
+crossing a threshold) — on top of the usual distance-reached and
+relaxed-long-enough triggers from the single-cell run-and-tumble
+notebook.
 
-Produces a path plot (two colours before the merge, one after, with the
-merge point marked), and `two_cell_walk.mp4`.
-
-**Not executed** — same reasoning and the same verification (syntax
-check + a clean `pyflakes` pass) as the previous two additions. $N=192$
-(bigger box, two cells) costs roughly $2$–$2.5\times$ per step versus
-the single-cell grid; a $400$-time-unit run is a reasoned estimate of
-$4$–$5$ minutes, not a measured one.
-
-A standalone writeup of the physics and mechanics behind this
-notebook — what Version 3's equations are, exactly what changed and
-why, and what the (not-yet-measured) diagnostics are designed to show
-— is in [`docs/two_cell_walk_physics.pdf`](docs/two_cell_walk_physics.pdf)
-(source: `docs/two_cell_walk_physics.tex`).
+**Executed**, unlike the two single-cell additions — the physics here
+(the shared Stokes solve, and especially the wall potential, which
+diverged on the first attempt) was new enough that shipping it
+unverified would not have been trustworthy. A $140$-time-unit run at
+$N=192$ ($\approx9$–$11\,\mathrm{ms}$/step measured, not estimated)
+produced $3$ collision events, a maximum contact overlap of $2.07$
+(well under the $\approx8.7$ a non-interacting pair shows at nominal
+touching — confirmed, not assumed), and a clean path plot showing
+both cells visibly deflect at contact rather than cross straight
+through each other. `two_cell_walk.mp4` is a 46-frame, 8 fps video of
+the whole run.
 
 ## Next steps
 
-Two phase fields, $\phi_1,\mathbf P_1$ and $\phi_2,\mathbf P_2$, sharing one
-Stokes solve: `stokes_solve` sees the combined body force
-$\mathbf f_1+\mathbf f_2$ and returns one $\mathbf v$ felt by both cells,
-with the same steric-repulsion term, $F_{\rm rep}=k_{\rm rep}\int\phi_1^2\phi_2^2$,
-used in the Version 4 two-cell experiment. After that: mechanosensitive
-adhesion $\xi(|\mathbf v|)$ with a cycle in the activity, to test the Leoni
-& Sens biphasic prediction; spontaneous polarity so a cell chooses its own
-direction instead of being handed a uniform or radial $\mathbf P$; and
-coupling the Version 2 slice to the Version 3 solver to get the pseudopod
-and the top-view cell shapes in one calculation.
+More than two cells (the shared-Stokes idea generalises directly:
+sum every cell's body force before the one solve, and add a steric
+term for every pair); mechanosensitive adhesion $\xi(|\mathbf v|)$ with
+a cycle in the activity, to test the Leoni & Sens biphasic prediction;
+and coupling the Version 2 slice to the Version 3 solver to get the
+pseudopod and the top-view cell shapes in one calculation.
