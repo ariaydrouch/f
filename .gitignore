@@ -1,0 +1,9 @@
+.covenant_state/
+docs/*.aux
+docs/*.log
+docs/*.out
+.mypy_cache/
+*.pyc
+__pycache__/
+.pytest_cache/
+.venv/
