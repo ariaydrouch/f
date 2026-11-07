@@ -166,13 +166,13 @@ d.rect(28, 330, 904, 150, fill=GRAY, r=6)
 d.text(38, 336, 600, "How I got the numbers, and how sure I am", 9.5, NAVY, True)
 arows = [["Activity", "Today formula", "Assumption and basis", "Confidence"],
          ["Assemble context", "6.0 min x 16 touches = 96", "~1 min per screen x 6-7 systems (brief); 16 touches = about a third of 48 cases + 6 new alerts", "Medium"],
-         ["Documentation", "8.0 min x 16 touches = 128", "Call note ~5 min; full 40-field assessment ~15 min on ~1 in 3 touches; consistent with 25-35% of nursing time in documentation reviews (Moy 2021)", "Medium"],
+         ["Documentation", "8.0 min x 16 touches = 128", "Call note ~5 min; full 40-field assessment ~15 min on ~1 in 3 touches; = 27% of day, top of the 19-27% range seen in nurse time studies (RAND 2012; Baumann 2018); case management is phone + paperwork, so I assume the high end", "Medium"],
          ["Outreach friction", "4.5 min x 16 = 72", "~2.5 attempts per touch x ~1.8 min lookup/dial/voicemail; ~30% attempts connect (assumption)", "Low-Medium"],
          ["Triage / spreadsheet", "35 min fixed", "Morning queue scan + after each alert wave", "Medium"],
          ["Conversations", "remainder = %d min" % CONV_B, "Cross-check: ~4 connected calls x 15 min = 60 min; matches '2 real conversations by 3 pm'", "Medium"]]
 d.table(38, 352, [100, 140, 520, 80], arows, 7.2, hfill=NAVY)
 d.text(38, 456, 880, "<b>Sensitivity:</b> if documentation is 6 min/touch instead of 8, waste share is still ~62%. Targets assume 20 touches/day with the workbench and that the nurse confirms every AI draft. To be validated by shadowing 5-8 nurses (time-and-motion) in week 1 of the pilot.", 7.6, INK, lead=9.2)
-d.foot("Sources: HiLabs case brief; Moy et al. JAMIA 2021 (nurse documentation burden); Sinsky et al. Ann Intern Med 2016. All per-touch minutes are my estimates, flagged for pilot validation.")
+d.foot("Sources: HiLabs case brief; Hendrich/RAND 2012 (nurses ~19% of time on documentation); Baumann et al. Health Policy 2018 (nurses 23% post-EHR); Sinsky et al. Ann Intern Med 2016. All per-touch minutes are my estimates, flagged for pilot validation.")
 
 # ============================================================ 4-5 DATA INVENTORY
 def inv_rows(sub):

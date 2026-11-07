@@ -199,7 +199,7 @@ TIME_ROWS = [
  ("Assemble context (6-7 screens, reconcile meds)", 6.0, 2.5, 0, 0, "waste",
   "Opening claims, auth, pharmacy, HIE, old notes, own sheet: ~1 min per screen. Workbench pre-assembles; nurse reviews 1 screen.", "Medium"),
  ("Documentation (assessment, plan, call note, audit forms)", 8.0, 4.5, 0, 0, "waste",
-  "Triangulated: 40-field assessment ~15 min but only on some touches; call notes ~5 min; average 8 min per touch. Lit. range 25-35% of nursing time.", "Medium"),
+  "Triangulated: 40-field assessment ~15 min but only on some touches; call notes ~5 min; average 8 min per touch. Nurse time studies: ~19-27% of time on documentation/EHR tasks; I assume the high end for phone-based case management.", "Medium"),
  ("Outreach friction (dial, voicemail, wrong numbers, retries)", 4.5, 3.2, 0, 0, "waste",
   "~2.5 attempts per touch x ~1.8 min lookup/dial/voicemail. Only ~30% of attempts connect (assumption).", "Low-Medium"),
  ("Queue triage & side spreadsheet", 0, 0, 35, 5, "waste",
@@ -211,7 +211,7 @@ TIME_ROWS = [
 ]
 
 PAINS = [  # rank, pain, minutes/day today, clinical risk, evidence
- (1, "Documentation re-typed across assessment, plan, notes, audit forms", 128, "Medium", "Case brief; nurse documentation 25-35% of time in reviews"),
+ (1, "Documentation re-typed across assessment, plan, notes, audit forms", 128, "Medium", "Case brief; nurse time studies: ~19-27% of time on documentation"),
  (2, "Context assembly across 6-7 screens", 96, "High", "Case brief; missed signals = missed med/safety issues"),
  (3, "Hard outreach: dead numbers, voicemail, wrong channel/time", 72, "High", "Case brief; no contact = no intervention"),
  (4, "Stale / delayed data hides events (claims 45d, ADT without reason)", 0, "High", "Claims run-out 30-90d; ADT has no diagnosis"),
@@ -225,8 +225,8 @@ SOURCES = [
  "CMS Transitional Care Management, CPT 99495/99496: contact within 2 business days; visit within 14/7 days.",
  "NCQA HEDIS measures: TRC (transitions of care), FUH (follow-up after mental-illness hospitalization, 7/30 days), FMC (follow-up after ED visit, multiple chronic conditions), PCR (readmissions).",
  "CMS Medicare Star Ratings Technical Notes: Part D adherence measures (diabetes, RAS antagonists, statins; PDC >=80%), triple-weighted.",
- "Sinsky et al. Allocation of physician time in ambulatory practice. Ann Intern Med 2016;165:753-60 (EHR/desk work ~2x direct patient time).",
- "Moy et al. Measurement of clinical documentation burden among physicians and nurses using EHR use data: scoping review. JAMIA 2021 (nurse documentation roughly a fifth to a third of time).",
+ "Sinsky et al. Allocation of physician time in ambulatory practice. Ann Intern Med 2016;165:753-60 (EHR/desk work ~49% vs ~27% direct patient time, i.e. ~1.8x).",
+ "Hendrich et al. / RAND 2012: nurses spent ~19% of time on documentation (time-and-motion, 105 units). Baumann et al. The impact of EHR systems on clinical documentation times: systematic review. Health Policy 2018: nurses 9% pre-EHR to 23% post-EHR. ED nurse time-and-motion (PMC11216543): 27% of time on EHR tasks.",
  "Cutler et al. Economic impact of medication non-adherence by disease groups. BMJ Open 2018.",
  "Ancker et al. Effects of workload, work complexity and repeated alerts on alert fatigue. BMC Med Inform Decis Mak 2017.",
  "HHS: HIPAA minimum-necessary rule; 42 CFR Part 2 (SUD records); FCC TCPA (consent for autodialed/SMS outreach).",
