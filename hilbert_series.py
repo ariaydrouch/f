@@ -38,6 +38,7 @@ contains the current variable t_j has exponent exactly +1 on t_j.
 """
 import sys
 import time
+from fractions import Fraction
 
 import sympy as sp
 from sympy.polys.rings import ring
@@ -334,23 +335,35 @@ def _integrate_task(args):
 
 
 MIN_PARALLEL_TERMS = 16      # below this the pool overhead is not worth paying
+CHUNKS_PER_WORKER = 16       # small chunks: load balance and bounded per-worker memory
 
 
 def integrate_variable(state, j, L, nt, nx, pool=None, workers=1):
     """One iterated residue: eliminate t_{j+1} from every term.
     Terms are independent, so with a pool they are split into chunks that are
-    processed in separate processes and merged afterwards."""
+    processed in separate processes; each partial result is merged into the new
+    state as soon as it arrives and then dropped, so that at most a few partial
+    dictionaries are alive at any time."""
+    from concurrent.futures import as_completed
     items = list(state.items())
     if pool is None or len(items) < MIN_PARALLEL_TERMS:
         new_state = _integrate_items(items, j, L, PoleClassifier(nt, nx))
     else:
-        nchunks = min(len(items), workers * 4)           # several chunks per worker: load balance
-        tasks = [(items[i::nchunks], j, L, nt, nx) for i in range(nchunks)]
+        nchunks = min(len(items), workers * CHUNKS_PER_WORKER)
+        futures = {pool.submit(_integrate_task, (items[i::nchunks], j, L, nt, nx))
+                   for i in range(nchunks)}
+        del items
         new_state = {}
-        for part in pool.map(_integrate_task, tasks):
+        for fut in as_completed(futures):
+            futures.discard(fut)
+            part = fut.result()
+            del fut
             for sig, c in part.items():
                 new_state[sig] = new_state.get(sig, 0) + c
-    return {sig: c for sig, c in new_state.items() if c}
+            del part
+    for sig in [sig for sig, c in new_state.items() if not c]:
+        del new_state[sig]
+    return new_state
 
 
 # ---------------------------------------------------------------------------
@@ -575,18 +588,395 @@ def hilbert_series(N, d, equal_x=False, workers=1, verbose=False):
     return Z, sp.factor(sp.cancel(Z.subs({xi: x for xi in xs})))
 
 
+# ---------------------------------------------------------------------------
+# Section 7: Hironaka form of the singly graded series
+# ---------------------------------------------------------------------------
+# Z(x) = P(x) / prod_i (1 - x^{d_i})^{m_i}, with sum m_i = Krull dimension.
+# The ring of invariants is Cohen-Macaulay (Hochster-Roberts), so for the degrees
+# of an actual system of primary invariants P has non-negative coefficients and
+# P(1) is the number of secondary invariants (including the trivial one, 1).
+#
+# P(1) is NOT an invariant of the ring: with e = lim_{x->1} (1-x)^D Z(x),
+#     P(1) = e * prod_i d_i^{m_i},
+# so a different (equally valid) choice of primary degrees changes the count.
+#
+# Polynomials below are dense coefficient lists, lowest degree first.
+
+def _poly_mul_binomial(p, k):
+    """p(x) * (1 - x^k)."""
+    out = p + [0] * k
+    for i, c in enumerate(p):
+        out[i + k] -= c
+    return out
+
+
+def _poly_exact_div(p, q):
+    """p / q for integer polynomials, q with leading coefficient +-1; error if inexact."""
+    p = list(p)
+    dq = len(q) - 1
+    lc = q[-1]
+    if lc not in (1, -1):
+        raise ValueError("divisor must have leading coefficient +-1")
+    quo = [0] * max(len(p) - dq, 1)
+    for i in range(len(p) - 1 - dq, -1, -1):
+        c = p[i + dq] * lc
+        if c:
+            quo[i] = c
+            for j, qc in enumerate(q):
+                p[i + j] -= c * qc
+    if any(p[:dq]):
+        raise ArithmeticError("denominator does not divide numerator")
+    while len(quo) > 1 and quo[-1] == 0:
+        quo.pop()
+    return quo
+
+
+def _coeffs(expr, x):
+    return [int(c) for c in reversed(sp.Poly(expr, x).all_coeffs())]
+
+
+def cyclotomic_exponents(den, x):
+    """{k: a_k} with den = +- prod_k Phi_k(x)^{a_k}."""
+    _, flist = sp.factor_list(den, x)
+    a = {}
+    for f, m in flist:
+        fp = sp.Poly(f, x)
+        deg = fp.degree()
+        for k in range(1, 2 * deg * deg + 3):            # phi(k) >= sqrt(k/2)
+            if sp.totient(k) != deg:
+                continue
+            ck = sp.Poly(sp.cyclotomic_poly(k, x), x)
+            if fp == ck or fp == -ck:
+                a[k] = a.get(k, 0) + m
+                break
+        else:
+            raise ValueError(f"denominator factor {f} is not cyclotomic")
+    return a
+
+
+def covers(degrees, a):
+    """True if prod (1 - x^d)^m is divisible by prod Phi_k^{a_k}: for every k at
+    least a_k of the degrees are multiples of k, and there are exactly a_1 of them."""
+    if sum(degrees.values()) != a.get(1, 0):
+        return False
+    return all(sum(m for d, m in degrees.items() if d % k == 0) >= ak for k, ak in a.items())
+
+
+# Primary degrees quoted in arXiv:2503.20097 for d = 2 (eqs. 3.40, 3.46, 3.48,
+# 3.51, D.1).  The Hilbert series alone does not fix these; they are a choice.
+PAPER_DEGREES_D2 = {
+    1: {1: 2},
+    2: {1: 2, 2: 3},
+    3: {1: 2, 2: 3, 3: 4, 4: 1},
+    4: {1: 2, 2: 3, 3: 4, 4: 6, 6: 2},
+    5: {1: 2, 2: 3, 3: 4, 4: 6, 5: 6, 6: 5},
+    6: {1: 2, 2: 3, 3: 4, 4: 6, 5: 7, 6: 9, 8: 6},
+    7: {1: 2, 2: 3, 3: 4, 4: 6, 5: 8, 6: 11, 7: 8, 8: 5, 10: 2, 12: 1},
+}
+
+
+class HironakaForm:
+    """Z(x) = numerator(x) / prod_{d, m in degrees} (1 - x^d)^m."""
+
+    def __init__(self, degrees, numerator):
+        self.degrees = degrees                  # {d: m}
+        self.numerator = numerator              # coefficient list, lowest degree first
+
+    @property
+    def krull_dim(self):
+        return sum(self.degrees.values())
+
+    @property
+    def secondaries(self):
+        """P(1): number of secondary invariants, the trivial one (=1) included."""
+        return sum(self.numerator)
+
+    @property
+    def nonnegative(self):
+        return all(c >= 0 for c in self.numerator)
+
+    @property
+    def palindromic(self):
+        return self.numerator == self.numerator[::-1]
+
+    def degree_sum(self):
+        return sum(d * m for d, m in self.degrees.items())
+
+    def series(self, n):
+        """First n+1 coefficients of Z(x)."""
+        s = (self.numerator + [0] * (n + 1))[:n + 1]
+        for d, m in self.degrees.items():
+            for _ in range(m):
+                for i in range(d, n + 1):
+                    s[i] += s[i - d]
+        return s
+
+    def denominator_str(self):
+        parts = []
+        for d, m in self.degrees.items():
+            b = "(1 - x)" if d == 1 else f"(1 - x^{d})"
+            parts.append(b if m == 1 else f"{b}^{m}")
+        return " ".join(parts)
+
+    def numerator_str(self):
+        terms = []
+        for i, c in enumerate(self.numerator):
+            if c:
+                mon = "1" if i == 0 else ("x" if i == 1 else f"x^{i}")
+                if i == 0:
+                    terms.append(f"{c}")
+                else:
+                    terms.append(mon if c == 1 else f"-{mon}" if c == -1 else f"{c}*{mon}")
+        return " + ".join(terms).replace("+ -", "- ")
+
+    def __str__(self):
+        return f"({self.numerator_str()}) / ({self.denominator_str()})"
+
+
+class ReducedSeries:
+    """Z(x) = num(x) / den(x) in lowest terms, den = +- prod_k Phi_k^{a_k}."""
+
+    def __init__(self, Z, x=None):
+        if x is None:
+            (x,) = Z.free_symbols
+        num, den = sp.fraction(sp.cancel(sp.together(Z)))
+        self.a = cyclotomic_exponents(den, x)
+        self.num = _coeffs(num, x)
+        self.den = _coeffs(den, x)
+        self.krull_dim = self.a.get(1, 0)
+        # e = lim_{x->1} (1-x)^D Z(x); Phi_k(1) = p for k = p^j, else 1 (k > 1)
+        phi1 = 1
+        for k, ak in self.a.items():
+            if k > 1:
+                fac = sp.factorint(k)
+                if len(fac) == 1:
+                    phi1 *= next(iter(fac)) ** ak
+        self.e = Fraction(abs(sum(self.num)), phi1)
+
+    def numerator_for(self, degrees):
+        p = list(self.num)
+        for d, m in degrees.items():
+            for _ in range(m):
+                p = _poly_mul_binomial(p, d)
+        return _poly_exact_div(p, self.den)
+
+    def series(self, n):
+        """First n+1 Taylor coefficients of num/den (den(0) = +-1)."""
+        c0 = self.den[0]
+        out = []
+        for i in range(n + 1):
+            v = self.num[i] if i < len(self.num) else 0
+            for j in range(1, min(i, len(self.den) - 1) + 1):
+                v -= self.den[j] * out[i - j]
+            out.append(v * c0)
+        return out
+
+
+def hironaka_candidates(Z, x=None, max_secondaries=None, max_degree=None):
+    """All primary-degree choices {d: m} giving a non-negative numerator with
+    P(1) <= max_secondaries, sorted by (P(1), sum of degrees).
+
+    Non-negativity is necessary for a system of primary invariants with these
+    degrees but not sufficient: which choices are realised by algebraically
+    independent invariants cannot be read off the Hilbert series.
+
+    Search: degrees are fixed in increasing order.  Factors of degree > k do not
+    change the coefficients of x^0..x^k, so with P the running product
+    Z * prod (1 - x^d)^m over the degrees chosen so far, at most P[k] factors of
+    degree k may be added.  P(1) = e * prod d^m prunes the rest."""
+    rs = Z if isinstance(Z, ReducedSeries) else ReducedSeries(Z, x)
+    a, D, e = rs.a, rs.krull_dim, rs.e
+    if max_degree is None:
+        max_degree = 2 * max(a)
+    if max_secondaries is None:
+        max_secondaries = 4
+        while True:
+            found = hironaka_candidates(rs, None, max_secondaries, max_degree)
+            if found:
+                return found
+            max_secondaries *= 4
+    found = []
+
+    def rec(k, P, chosen, left, prod):
+        if left == 0:
+            if covers(chosen, a):
+                p = rs.numerator_for(chosen)
+                if min(p) >= 0:
+                    found.append(HironakaForm(dict(chosen), p))
+            return
+        if k > max_degree or e * prod * k ** left > max_secondaries:
+            return
+        for m in range(min(P[k], left), -1, -1):
+            if m < left and e * prod * k ** m * (k + 1) ** (left - m) > max_secondaries:
+                continue
+            P2 = list(P)
+            for _ in range(m):
+                for i in range(max_degree, k - 1, -1):
+                    P2[i] -= P2[i - k]
+            if m:
+                chosen[k] = m
+            rec(k + 1, P2, chosen, left - m, prod * k ** m)
+            chosen.pop(k, None)
+
+    rec(1, rs.series(max_degree), {}, D, 1)
+    found.sort(key=lambda hf: (hf.secondaries, hf.degree_sum()))
+    return found
+
+
+def hironaka_form(Z, x=None, degrees=None):
+    """Rewrite a univariate Hilbert series Z(x) as P(x) / prod (1 - x^d)^m.
+
+    degrees : {d: m}, e.g. PAPER_DEGREES_D2[N].  Any choice that covers the
+              reduced denominator gives a polynomial P (checked by exact division).
+              If omitted, the non-negative choice with the smallest P(1) is used
+              (see `hironaka_candidates` for why this is only one possible choice)."""
+    rs = Z if isinstance(Z, ReducedSeries) else ReducedSeries(Z, x)
+    if degrees is None:
+        return hironaka_candidates(rs)[0]
+    degrees = dict(sorted(degrees.items()))
+    if sum(degrees.values()) != rs.krull_dim:
+        raise ValueError(f"{sum(degrees.values())} denominator factors given, "
+                         f"Krull dimension is {rs.krull_dim}")
+    return HironakaForm(degrees, rs.numerator_for(degrees))
+
+
+def free_trace_series(d, n):
+    """First n+1 coefficients of the N -> infinity series prod_k (1 - x^k)^(-c_k),
+    c_k = number of necklaces of length k in d colours (single traces of length k)."""
+    s = [1] + [0] * n
+    for k in range(1, n + 1):
+        ck = int(sum(sp.totient(m) * d ** (k // m) for m in sp.divisors(k)) // k)
+        # (1 - x^k)^(-ck) = sum_j binom(ck + j - 1, j) x^(jk)
+        b = [1]
+        for j in range(1, n // k + 1):
+            b.append(b[-1] * (ck + j - 1) // j)
+        s = [sum(b[j] * s[i - j * k] for j in range(i // k + 1)) for i in range(n + 1)]
+    return s
+
+
+def first_difference(a, b):
+    """Index of the first differing coefficient (None if equal over the common length)."""
+    return next((i for i, (u, v) in enumerate(zip(a, b)) if u != v), None)
+
+
+def _row(N, d, hf, rs, source):
+    return {
+        "N": N, "d": d, "source": source,
+        "denominator": {str(k): m for k, m in hf.degrees.items()},
+        "krull_dim": hf.krull_dim,
+        "numerator": hf.numerator,
+        "numerator_degree": len(hf.numerator) - 1,
+        "secondaries_P1": hf.secondaries,
+        "nontrivial_secondaries": hf.secondaries - 1,
+        "nonnegative": hf.nonnegative,
+        "palindromic": hf.palindromic,
+        "e": str(rs.e),
+    }
+
+
+def tabulate(Ns, d=2, workers=1, verbose=False, series_terms=40):
+    """Hironaka data for the singly graded series of d matrices.
+
+    Per N: one row with the paper's primary degrees (d = 2, N <= 7) and one with
+    the non-negative choice of smallest P(1).  `e` = P(1) / prod d^m does not
+    depend on the choice.  `agrees_with_free_below` is the first degree at which
+    Z_N differs from the N -> infinity series (trace relations start at N + 1)."""
+    rows = []
+    free = free_trace_series(d, series_terms)
+    for N in Ns:
+        t0 = time.time()
+        _, Zx = hilbert_series(N, d, equal_x=d > 1, workers=workers, verbose=verbose)
+        rs = ReducedSeries(Zx, sp.Symbol("x"))
+        forms = []
+        if d == 2 and N in PAPER_DEGREES_D2:
+            forms.append((hironaka_form(rs, degrees=PAPER_DEGREES_D2[N]), "paper"))
+        best = hironaka_candidates(rs)[0]
+        if not forms or best.degrees != forms[0][0].degrees:
+            forms.append((best, "min P(1)"))
+        diff = first_difference(rs.series(series_terms), free)
+        for hf, source in forms:
+            row = _row(N, d, hf, rs, source)
+            row["agrees_with_free_below"] = diff
+            row["seconds"] = round(time.time() - t0, 2)
+            rows.append(row)
+    return rows
+
+
+def _print_hironaka(hf):
+    print(f"Hironaka form: Z(x) = P(x) / [{hf.denominator_str()}]")
+    print(f"  P(x) = {hf.numerator_str()}")
+    print(f"  primary invariants (Krull dim) = {hf.krull_dim}")
+    print(f"  P(1) = {hf.secondaries} secondary invariants "
+          f"({hf.secondaries - 1} non-trivial, i.e. excluding 1)")
+    print(f"  P >= 0: {hf.nonnegative}   palindromic: {hf.palindromic}   "
+          f"deg P = {len(hf.numerator) - 1}, sum d_i m_i = {hf.degree_sum()}")
+
+
+def _parse_degrees(s):
+    """'1:2,2:3,3:4' -> {1: 2, 2: 3, 3: 4}"""
+    return {int(k): int(m) for k, m in (item.split(":") for item in s.split(","))}
+
+
 def main():
-    N = int(input("N (size of matrices): "))
-    d = int(input("d (number of matrices): "))
-    eq = d > 1 and input("Compute only the all-equal case x_i = x directly? (y/n): ").strip().lower().startswith("y")
-    w = int(input("Worker processes (1 = serial, 0 = all cores): ") or "1")
-    Z, Zx = hilbert_series(N, d, equal_x=eq, workers=w, verbose=True)
+    import argparse
+    import json
+    ap = argparse.ArgumentParser(description=__doc__.split("\n")[1])
+    ap.add_argument("--N", type=int, help="matrix size (omit for interactive mode)")
+    ap.add_argument("--d", type=int, default=2, help="number of matrices")
+    ap.add_argument("--graded", action="store_true",
+                    help="also compute the multigraded series in x1..xd")
+    ap.add_argument("--table", nargs=2, type=int, metavar=("NMIN", "NMAX"),
+                    help="tabulate Hironaka numerators for N = NMIN..NMAX")
+    ap.add_argument("--json", help="write the table to this file")
+    ap.add_argument("--workers", type=int, default=1, help="1 = serial, 0 = all cores")
+    ap.add_argument("--degrees", type=_parse_degrees,
+                    help="primary degrees for the Hironaka form, e.g. 1:2,2:3,3:4,4:6,6:2 "
+                         "(default: the paper's for d = 2, else the smallest P(1))")
+    ap.add_argument("--candidates", type=int, default=0, metavar="K",
+                    help="also list the K non-negative degree choices with smallest P(1)")
+    args = ap.parse_args()
+
+    if args.table:
+        rows = tabulate(range(args.table[0], args.table[1] + 1), args.d, args.workers, verbose=True)
+        print(f"{'N':>3} {'source':>9} {'primary':>7} {'P(1)':>20} {'non-trivial':>20} "
+              f"{'deg P':>5}  denominator degrees d^m")
+        for r in rows:
+            den = " ".join(f"{k}^{m}" for k, m in r["denominator"].items())
+            print(f"{r['N']:>3} {r['source']:>9} {r['krull_dim']:>7} {r['secondaries_P1']:>20,} "
+                  f"{r['nontrivial_secondaries']:>20,} {r['numerator_degree']:>5}  {den}"
+                  + ("" if r["nonnegative"] else "  (P has negative coefficients!)"))
+        if args.json:
+            with open(args.json, "w") as fh:
+                json.dump(rows, fh, indent=1)
+        return
+
+    if args.N is None:
+        N = int(input("N (size of matrices): "))
+        d = int(input("d (number of matrices): "))
+        eq = d > 1 and input("Compute only the all-equal case x_i = x directly? (y/n): ").strip().lower().startswith("y")
+        w = int(input("Worker processes (1 = serial, 0 = all cores): ") or "1")
+    else:
+        N, d, eq, w = args.N, args.d, not args.graded, args.workers
+    Z, Zx = hilbert_series(N, d, equal_x=eq and d > 1, workers=w, verbose=True)
     print()
     if Z is not None:
         print("Z =", Z)
     if Zx is not None:
         print()
         print("Z with all x_i = x:" if not eq else "Z (all x_i = x):", Zx)
+    Zx = Zx if Zx is not None else Z
+    rs = ReducedSeries(Zx, sp.Symbol("x"))
+    degrees = args.degrees
+    if degrees is None and d == 2 and N in PAPER_DEGREES_D2:
+        degrees = PAPER_DEGREES_D2[N]
+    print()
+    _print_hironaka(hironaka_form(rs, degrees=degrees))
+    print(f"  e = P(1) / prod d^m = {rs.e}  (independent of the choice of degrees)")
+    if args.candidates:
+        print(f"\nNon-negative choices with smallest P(1) (necessary, not sufficient, "
+              f"for primary invariants of these degrees):")
+        for hf in hironaka_candidates(rs)[:args.candidates]:
+            print(f"  P(1) = {hf.secondaries:>12,}   {hf.denominator_str()}")
 
 
 if __name__ == "__main__":
