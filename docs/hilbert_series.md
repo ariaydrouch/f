@@ -294,9 +294,23 @@ $$
 
 because $P_k$ counts secondaries of degree $k$, and these are linearly
 independent elements of $R_k$. The code calls a degree choice **admissible** if
-it satisfies this. The smallest $P(1)$ over admissible choices is therefore
-$\le$ the true minimum number of secondaries. It *equals* the true minimum
-precisely when invariants of those degrees forming an hsop exist.
+it satisfies this.
+
+Why this gives a lower bound, step by step:
+
+1. Let $\mathcal R$ = degree lists $\{d_i^{m_i}\}$ for which an hsop really
+   exists ("realisable"), and $\mathcal A$ = degree lists that are admissible.
+2. Every realisable list is admissible: take the actual hsop and secondaries.
+   Then $P_k$ *is* the number of secondaries of degree $k$, a count
+   (so $\ge 0$) of linearly independent vectors in $R_k$ (so $\le h_k$).
+   Hence $\mathcal R \subseteq \mathcal A$.
+3. The true minimum number of secondaries is $\min_{\mathcal R} P(1)$. The
+   code computes $\min_{\mathcal A} P(1)$. A minimum over a bigger set can
+   only be smaller or equal: $\min_{\mathcal A} P(1) \le \min_{\mathcal R} P(1)$.
+4. Equality holds iff the admissible minimiser is itself realisable, i.e.
+   iff invariants of those degrees forming an hsop exist. The converse of 2
+   fails in general: Example B below has an admissible $P$ in the multigrading
+   with no hsop behind it.
 
 To certify a choice you would need actual invariants. By Hilbert's criterion,
 homogeneous invariants $\theta_1..\theta_D$ form an hsop iff their common zero
@@ -444,7 +458,10 @@ degrees $1^2 2^3 3^4 4^6\,5\,6$ form an hsop requires the Gröbner computation
 described above, in 32 variables, which this code does not attempt. Until
 then, 40 is only a lower bound on the number of secondaries. Neither the
 degree-5 choice nor the paper's $1^2 2^3 3^4 4^6 6^2$ has been checked here to be
-realised by actual invariants.
+realised by actual invariants. One thing the bigrading does show (§10): the
+paper's choice for $N=4$ is the $x=y$ specialisation of an *admissible
+bigraded* Hironaka form, and no admissible bigraded form has fewer than 48
+secondaries. So 40 would need primaries that are not bihomogeneous.
 
 ### 5.8 What should be minimised?
 
@@ -558,3 +575,146 @@ Small notes on the original code:
 * The original driver applied `sympy.factor` to the numerator. This is
   harmless but slow for large numerators, and it hides the Hironaka structure,
   which Section 7 reconstructs.
+
+---
+
+## 10. Forms in the matrix (species) grading (Section 8 of the code)
+
+With `equal_x=False` every matrix $X_a$ has its own variable $x_a$, and
+`molien_weyl_raw` returns the series in lowest terms as raw dictionaries.
+
+**Rays.** Every irreducible factor of the reduced denominator is
+$\pm\Phi_j(x^\beta)$ for a cyclotomic polynomial $\Phi_j$ and a primitive
+exponent vector $\beta$, its **ray** (`_ray_of`). Write $a_{\beta,j}$ for the
+exponent of $\Phi_j(x^\beta)$.
+
+**Lower bound on the number of factors.** A species-homogeneous primary of
+multidegree $\alpha$ contributes $(1-x^\alpha)$. Write $\alpha = k\beta$ with
+$\beta$ primitive. Then $1-x^{k\beta} = -\prod_{j\mid k}\Phi_j(x^\beta)$ contains
+$\Phi_1(x^\beta)$ exactly once, and factors on other rays never contain it.
+For $P$ to be a polynomial, at least $a_{\beta,1}$ factors must lie on ray $\beta$, so
+
+$$
+F \;\ge\; F_{\min} = \sum_\beta a_{\beta,1}.
+$$
+
+A Hironaka form needs $F = D$. **If $F_{\min} > D$, no hsop made of
+species-homogeneous invariants exists.** The simplest binomial form then has
+$F_{\min}$ factors, and its numerator vanishes at $x=(1,\dots,1)$ to order
+$F_{\min}-D$.
+
+**`species_form(raw, D)`.** On each ray it takes $a_{\beta,1}$ multipliers $k$
+such that, for every $j$, at least $a_{\beta,j}$ of them are multiples of $j$
+(`ray_covers`). It prefers the smallest product of the $k$, then the smallest
+sum. If $F_{\min} = D$, it walks through combinations of per-ray covers in
+increasing order of the specialised $P(1)$ (best-first, `_best_first`). It
+returns the first one that is admissible in the multigrading
+($0 \le P_\alpha \le h_\alpha$, using `_series_box`). The per-ray covers are
+allowed up to 8 times the per-ray minimal product. So every bigraded form with
+$P(1)$ up to 8 times the minimum is examined. For $d=2$, $N=4$ that range
+includes everything up to 48.
+
+`SpeciesForm.specialise()` sets all $x_a = x$, and `SpeciesForm.orbits()`
+groups the numerator terms by $S_d$ orbits.
+
+---
+
+## 11. Tables, patterns and insights
+
+The tables themselves are in [`docs/tables.md`](tables.md), produced by
+`python examples/make_tables.py --workers 4` in under a minute (the $N=6$
+series is cached in `data/series_cache.json`). The full data is in
+`data/tables.json`.
+
+### 11.1 $N = 2$: a closed form for every $d$
+
+For $2\times2$ matrices, write $X_a = \tfrac12\operatorname{Tr}X_a\,\mathbb 1 + Y_a$
+with $Y_a$ traceless. $PGL_2 = SO(3)$ acts on $\mathfrak{sl}_2 \cong \mathbb C^3$
+as on vectors, so
+
+$$
+R \;=\; \mathbb C[\operatorname{Tr}X_1,\dots,\operatorname{Tr}X_d]\;\otimes\;\mathbb C[(\mathbb C^3)^d]^{SO(3)} .
+$$
+
+* The $O(3)$ invariants are generated by the Gram entries
+  $\langle Y_a,Y_b\rangle$, so they form the coordinate ring of
+  **symmetric $d\times d$ matrices of rank $\le 3$**. That ring has dimension
+  $3d-3$ for $d\ge3$, and its degree is the Harris–Tu number
+  $\mathrm{HT}(d) = 2^{d-3}\,\mathrm{Cat}(d-2)$.
+* The extra $SO(3)$ invariants are the determinants $[Y_aY_bY_c]$, i.e.
+  $\operatorname{Tr}(X_a[X_b,X_c])$, which have odd degree.
+* By Cauchy and Weyl, the Hilbert series is
+
+$$
+Z_{N=2}(x_1..x_d) = \prod_a\frac1{1-x_a}\;\sum_{\substack{\lambda_1\ge\lambda_2\ge\lambda_3\ge0\\ \lambda_1\equiv\lambda_2\equiv\lambda_3\ (2)}} s_\lambda(x_1..x_d),
+$$
+
+  checked against the Molien–Weyl output for $d=2..8$.
+
+What this explains in the tables:
+
+* **Equal grading (table 2).** The degrees $1^d\,2^{3d-3}$ are $d$ traces plus
+  $3d-3$ generic combinations of Gram entries. They are realisable (§5.7) and
+  minimal, so
+  $S_{\min}(d) = 2\,\mathrm{HT}(d) = 2^{d-2}\mathrm{Cat}(d-2)$, which satisfies
+  $S(d+1)/S(d) = 4(2d-3)/d \to 8$.
+  * The even part of $P$ is the $h$-vector of the determinantal ring with $t\to x^2$,
+    and the odd part is its determinant-twisted copy. Each sums to $\mathrm{HT}(d)$.
+  * $P_2 = \binom{d-2}{2}$ is the codimension of the rank-$\le3$ locus.
+  * $P_3 = \binom d3$ counts the determinants.
+  * $P_1 = P_{3d-7} = 0$, $\deg P = 3d-6$, and $P$ is palindromic.
+* **Matrix grading (table 1).** $F_{\min} = 2d+\binom d2$, one factor for each of
+  $\operatorname{Tr}X_a$, $\operatorname{Tr}X_a^2$ and $\operatorname{Tr}X_aX_b$.
+  So the excess is
+  $F_{\min}-D = \binom d2-2d+3 = (d-2)(d-3)/2$, again the codimension of the
+  rank-$\le3$ locus. A species-graded Hironaka form exists **only for
+  $d\le3$**; from $d=4$ on, the primaries must mix species (Example B, §5.7).
+  For $d=4$ the minimal form is
+  $(1+e_3-e_1e_4-e_4^2)/\prod_a(1-x_a)(1-x_a^2)\prod_{a<b}(1-x_ax_b)$, with
+  $e_i$ the elementary symmetric polynomials.
+
+### 11.2 $d = 2$, all species equal (table 3)
+
+* **Gorenstein degree rule.** Every numerator is palindromic, with
+  $\deg P = \sum_i d_i m_i - dN^2$. For example, $N=6$ (min choice):
+  $174 - 72 = 102$. This is the functional equation
+  $Z(1/x) = (-1)^D x^{dN^2} Z(x)$, which holds because $PGL_N$ is semisimple
+  and the representation is unimodular.
+* **Primary degrees follow the free-trace generators.** Let $c_k$ be the number
+  of cyclic words of length $k$ in two letters ($2,3,4,6,8,14,\dots$). Every
+  minimal choice takes $m_k = c_k$ for $k \le N-1$ ($N=3,4$: also $k=N$), and then
+  fewer. This is the finite-$N$ shadow of $Z_\infty = \prod_k(1-x^k)^{-c_k}$.
+  Below degree $N$ there are no relations, so these traces really are free.
+* **No secondaries in degrees 1–4** for any $N\ge3$. The first non-trivial
+  secondary appears at degree 5 or 6.
+* **The numerator does not converge as $N\to\infty$.** $Z_N$ agrees with
+  $Z_\infty$ through degree $N$. But the multiplicity
+  $e_N$ (1/8, 1/1296, 1/1990656, …) collapses super-exponentially, while
+  $\prod d_i^{m_i}$ explodes. So $P(1)$ grows (1, 2, 40, 9640, 54,950,400), and
+  $P$'s middle coefficients do not stabilise. What converges is the series, not
+  the Hironaka data.
+* **The paper's choices** cost $48/40 = 1.2$, $11568/9640 = 1.2$ and
+  $156303360/54950400 \approx 2.84$ times the admissible minimum.
+
+### 11.3 $d = 2$, matrix grading (table 4)
+
+* On every ray, $a_{\beta,1} = N+1-|\beta|$ (checked for $N\le5$). Hence
+
+$$
+F_{\min}(N) = 2N + \sum_{n=2}^{N}\varphi(n)\,(N+1-n),
+\qquad
+F_{\min}-D = 0,0,0,2,4\ \ (N=2..6;\ N=6\ \text{from the formula}),
+$$
+
+  which grows like $N^3/\pi^2$, against $D = N^2+1$. **A bigraded hsop exists only
+  for $N\le4$.**
+* $N=3$: the form found is exactly the paper's (3.40),
+  $(1+x^3y^3)/\dots(1-xy)(1-x^2y^2)$.
+* $N=4$: the best admissible bigraded form has 48 secondaries, and its $x=y$
+  specialisation is exactly the paper's Table 3 denominator
+  $1^2 2^3 3^4 4^6 6^2$. That is where 48 comes from. The equal-graded
+  minimum of 40 needs primaries that are not bihomogeneous.
+* $N=5$: $F = 28 > D = 26$, so the numerator (226 terms) vanishes to second order
+  at $x=y=1$. It is symmetric under $x\leftrightarrow y$ and under
+  $(i,j)\to(23-i,\,23-j)$, the bigraded Gorenstein symmetry. It has no
+  positivity: coefficients up to $\pm 72$.
