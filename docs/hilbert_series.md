@@ -268,6 +268,23 @@ Every expression $P(x)/\prod(1-x^{d_i})^{m_i}$ equal to $Z(x)$ is equally
 * For a given $Z$ there are usually several degree choices with non-negative
   numerators. For $N=4$, $d=2$ they include $P(1) = 40, 48, 50, 56, 60, 60, 64,\dots$.
 
+**Why cancelling common factors is not enough.** A natural idea is to start
+from some Hironaka form and cancel as many common factors of $P$ and the
+denominator as possible while keeping the Hironaka structure. Cancellation only
+moves *down* in divisibility: the new denominator must divide the old one. It
+therefore stops at a form whose denominator has no valid proper divisor. These
+forms are not unique, and the one with the fewest secondaries can be
+unreachable. For $d=2$ the paper's forms for $N = 3..6$ already admit no further
+cancellation. Yet for $N=4$ the form with $P(1)=40$ has denominator
+$\dots(1-x^5)(1-x^6)$ instead of $\dots(1-x^6)^2$. Going from one to the other
+multiplies $P$ by $(1-x^5)/(1-x^6)$: it removes $\Phi_2\Phi_3\Phi_6$ from $P$
+but *adds* $\Phi_5$, which appears nowhere in the paper's denominator. This is a
+swap, not a cancellation. The same happens for $N=5$ (needs $\Phi_5$) and $N=6$
+(needs $\Phi_3^2\Phi_5\Phi_6^2$). The correct search space is all
+denominators $\prod(1-x^{d_i})^{m_i}$ with $\sum m_i = D$ that are *multiples of
+the fully reduced denominator* (`covers`), which is what
+`hironaka_candidates` enumerates.
+
 What the Hilbert series *can* give is a **lower bound**. If an hsop with
 degrees $\{d_i^{m_i}\}$ exists, the resulting numerator must satisfy
 
