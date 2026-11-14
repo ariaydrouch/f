@@ -772,53 +772,83 @@ class ReducedSeries:
         return out
 
 
-def hironaka_candidates(Z, x=None, max_secondaries=None, max_degree=None):
-    """All primary-degree choices {d: m} giving a non-negative numerator with
-    P(1) <= max_secondaries, sorted by (P(1), sum of degrees).
+def admissible(hf, h):
+    """Necessary conditions on a Hironaka form for primary invariants of its
+    degrees to exist, given the Hilbert series coefficients h (len(h) > deg P):
+      * P_k >= 0  (P_k counts the secondary invariants of degree k), and
+      * P_k <= h_k (secondaries of degree k are linearly independent invariants)."""
+    return all(0 <= c <= h[k] for k, c in enumerate(hf.numerator))
 
-    Non-negativity is necessary for a system of primary invariants with these
-    degrees but not sufficient: which choices are realised by algebraically
-    independent invariants cannot be read off the Hilbert series.
+
+def hironaka_candidates(Z, x=None, max_secondaries=None):
+    """All primary-degree choices {d: m} that pass `admissible` and have
+    P(1) <= max_secondaries, sorted by (P(1), sum of degrees).  The search is
+    exhaustive: no degree is excluded a priori, the bound on P(1) limits them.
+
+    With max_secondaries=None the bound is raised (x4) until something is found;
+    the first entry is then the admissible choice with the smallest P(1), which
+    is a LOWER BOUND for the number of secondary invariants of any Hironaka
+    decomposition.  Whether it is attained (whether algebraically independent
+    invariants of those degrees exist) cannot be read off the Hilbert series.
 
     Search: degrees are fixed in increasing order.  Factors of degree > k do not
     change the coefficients of x^0..x^k, so with P the running product
     Z * prod (1 - x^d)^m over the degrees chosen so far, at most P[k] factors of
-    degree k may be added.  P(1) = e * prod d^m prunes the rest."""
+    degree k may be added.  P(1) = e * prod d^m >= e * prod * k^left prunes the
+    rest, which also caps the largest degree that can occur."""
     rs = Z if isinstance(Z, ReducedSeries) else ReducedSeries(Z, x)
     a, D, e = rs.a, rs.krull_dim, rs.e
-    if max_degree is None:
-        max_degree = 2 * max(a)
     if max_secondaries is None:
         max_secondaries = 4
         while True:
-            found = hironaka_candidates(rs, None, max_secondaries, max_degree)
+            found = hironaka_candidates(rs, None, max_secondaries)
             if found:
                 return found
             max_secondaries *= 4
     found = []
+    series_cache = {}
+
+    def series(n):
+        if n not in series_cache:
+            series_cache[n] = rs.series(n)
+        return series_cache[n]
+
+    def times_binomial(P, k):
+        P = list(P)
+        for i in range(len(P) - 1, k - 1, -1):
+            P[i] -= P[i - k]
+        return P
+
+    def rebuild(chosen, n):
+        P = series(n)
+        for d, m in chosen.items():
+            for _ in range(m):
+                P = times_binomial(P, d)
+        return P
 
     def rec(k, P, chosen, left, prod):
         if left == 0:
             if covers(chosen, a):
-                p = rs.numerator_for(chosen)
-                if min(p) >= 0:
-                    found.append(HironakaForm(dict(chosen), p))
+                hf = HironakaForm(dict(chosen), rs.numerator_for(chosen))
+                if admissible(hf, series(len(hf.numerator))):
+                    found.append(hf)
             return
-        if k > max_degree or e * prod * k ** left > max_secondaries:
+        if e * prod * k ** left > max_secondaries:
             return
+        if k >= len(P):
+            P = rebuild(chosen, 2 * k + 8)
         for m in range(min(P[k], left), -1, -1):
             if m < left and e * prod * k ** m * (k + 1) ** (left - m) > max_secondaries:
                 continue
-            P2 = list(P)
+            P2 = P
             for _ in range(m):
-                for i in range(max_degree, k - 1, -1):
-                    P2[i] -= P2[i - k]
+                P2 = times_binomial(P2, k)
             if m:
                 chosen[k] = m
             rec(k + 1, P2, chosen, left - m, prod * k ** m)
             chosen.pop(k, None)
 
-    rec(1, rs.series(max_degree), {}, D, 1)
+    rec(1, series(2 * max(a) + 8), {}, D, 1)
     found.sort(key=lambda hf: (hf.secondaries, hf.degree_sum()))
     return found
 
@@ -828,8 +858,8 @@ def hironaka_form(Z, x=None, degrees=None):
 
     degrees : {d: m}, e.g. PAPER_DEGREES_D2[N].  Any choice that covers the
               reduced denominator gives a polynomial P (checked by exact division).
-              If omitted, the non-negative choice with the smallest P(1) is used
-              (see `hironaka_candidates` for why this is only one possible choice)."""
+              If omitted, the admissible choice with the smallest P(1) is used
+              (see `hironaka_candidates` for why this is only a lower bound)."""
     rs = Z if isinstance(Z, ReducedSeries) else ReducedSeries(Z, x)
     if degrees is None:
         return hironaka_candidates(rs)[0]
@@ -878,7 +908,7 @@ def tabulate(Ns, d=2, workers=1, verbose=False, series_terms=40):
     """Hironaka data for the singly graded series of d matrices.
 
     Per N: one row with the paper's primary degrees (d = 2, N <= 7) and one with
-    the non-negative choice of smallest P(1).  `e` = P(1) / prod d^m does not
+    the admissible choice of smallest P(1).  `e` = P(1) / prod d^m does not
     depend on the choice.  `agrees_with_free_below` is the first degree at which
     Z_N differs from the N -> infinity series (trace relations start at N + 1)."""
     rows = []
@@ -930,10 +960,12 @@ def main():
     ap.add_argument("--json", help="write the table to this file")
     ap.add_argument("--workers", type=int, default=1, help="1 = serial, 0 = all cores")
     ap.add_argument("--degrees", type=_parse_degrees,
-                    help="primary degrees for the Hironaka form, e.g. 1:2,2:3,3:4,4:6,6:2 "
-                         "(default: the paper's for d = 2, else the smallest P(1))")
+                    help="explicit primary degrees for the Hironaka form, e.g. 1:2,2:3,3:4,4:6,6:2")
+    ap.add_argument("--choice", choices=("min", "paper"), default="min",
+                    help="if --degrees is not given: 'min' = admissible choice with the fewest "
+                         "secondary invariants (default), 'paper' = arXiv:2503.20097 (d = 2, N <= 7)")
     ap.add_argument("--candidates", type=int, default=0, metavar="K",
-                    help="also list the K non-negative degree choices with smallest P(1)")
+                    help="also list the K admissible degree choices with smallest P(1)")
     args = ap.parse_args()
 
     if args.table:
@@ -967,14 +999,16 @@ def main():
     Zx = Zx if Zx is not None else Z
     rs = ReducedSeries(Zx, sp.Symbol("x"))
     degrees = args.degrees
-    if degrees is None and d == 2 and N in PAPER_DEGREES_D2:
+    if degrees is None and args.choice == "paper":
+        if d != 2 or N not in PAPER_DEGREES_D2:
+            raise SystemExit("--choice paper is only available for d = 2, N <= 7")
         degrees = PAPER_DEGREES_D2[N]
     print()
     _print_hironaka(hironaka_form(rs, degrees=degrees))
     print(f"  e = P(1) / prod d^m = {rs.e}  (independent of the choice of degrees)")
     if args.candidates:
-        print(f"\nNon-negative choices with smallest P(1) (necessary, not sufficient, "
-              f"for primary invariants of these degrees):")
+        print("\nAdmissible choices with smallest P(1) (0 <= P_k <= h_k: necessary, "
+              "not sufficient, for primary invariants of these degrees):")
         for hf in hironaka_candidates(rs)[:args.candidates]:
             print(f"  P(1) = {hf.secondaries:>12,}   {hf.denominator_str()}")
 
