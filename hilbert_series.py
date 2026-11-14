@@ -36,6 +36,8 @@ its first nonzero entry is positive, using  1 - x^(-m) = -x^(-m) (1 - x^m).
 Because the t's come first and are integrated in order, every binomial that
 contains the current variable t_j has exponent exactly +1 on t_j.
 """
+import itertools
+import math
 import sys
 import time
 from fractions import Fraction
@@ -535,22 +537,27 @@ def assemble(state, N, nx, mult, xs, nt, pool=None, workers=1):
         num = {tuple(m[i] - mins[i] for i in range(d)): c for m, c in num.items()}
         smin = [smin[i] + mins[i] for i in range(d)]
 
-    numer = R.from_dict(num).as_expr()
-    mono_expr = sp.Mul(*[xs[i] ** smin[i] for i in range(d)])
-    denom = sp.Mul(*[R.from_dict(dict(glist[gi])).as_expr() ** e for gi, e in remaining.items()])
-    return mono_expr, numer, denom
+    return tuple(smin), num, [(dict(glist[gi]), e) for gi, e in remaining.items()]
+
+
+def raw_to_expr(xs, raw):
+    """(monomial, numerator, denominator) sympy expressions from assemble's output."""
+    smin, num, den = raw
+    R, *_ = ring(xs, ZZ)
+    mono_expr = sp.Mul(*[x ** s for x, s in zip(xs, smin)])
+    denom = sp.Mul(*[R.from_dict(g).as_expr() ** e for g, e in den])
+    return mono_expr, R.from_dict(num).as_expr(), denom
 
 
 # ---------------------------------------------------------------------------
 # Section 6: driver
 # ---------------------------------------------------------------------------
-def hilbert_series(N, d, equal_x=False, workers=1, verbose=False):
-    """Hilbert series of d N x N matrices under simultaneous conjugation.
+def molien_weyl_raw(N, d, equal_x=False, workers=1, verbose=False):
+    """The Molien-Weyl integral in lowest terms as raw integer data.
 
-    equal_x=False: returns (Z, Z with all x_i = x) with Z in x1..xd
-                   (the second entry is None for d == 1, where Z already is that).
-    equal_x=True : all x_i = x from the start; returns (None, Z(x)).
-    workers      : 1 = serial; k > 1 = pool of k processes; 0 = all cores."""
+    Returns (xs, (smin, num, den)) with Z = x^smin * num / prod g^e over (g, e) in
+    den; num and each g are {exponent tuple: int} dicts, g irreducible.
+    xs = [x1..xd], or [x] if equal_x or d == 1."""
     import os
     if workers == 0:
         workers = os.cpu_count() or 1
@@ -559,28 +566,46 @@ def hilbert_series(N, d, equal_x=False, workers=1, verbose=False):
     mult = d if equal_x else 1
     xs = list(sp.symbols(f"x1:{nx + 1}")) if nx > 1 else [sp.Symbol("x")]
     if N == 1:
-        Z = sp.Mul(*[1 / (1 - x) for x in xs]) ** mult
+        # Z = prod_i (1 - x_i)^-mult = (-1)^(nx*mult) / prod_i (x_i - 1)^mult
+        zero = (0,) * nx
+        den = [({tuple(int(u == i) for u in range(nx)): 1, zero: -1}, mult) for i in range(nx)]
+        return xs, (zero, {zero: (-1) ** (nx * mult)}, den)
+    nt = N - 1
+    L = nt + nx
+    t0 = time.time()
+    pool = None
+    if workers > 1:
+        from concurrent.futures import ProcessPoolExecutor
+        pool = ProcessPoolExecutor(max_workers=workers)
+    try:
+        state = initial_state(N, nx, mult)
+        for j in range(nt):
+            state = integrate_variable(state, j, L, nt, nx, pool, workers)
+            if verbose:
+                print(f"  integrated t{j + 1}: {len(state)} terms "
+                      f"({time.time() - t0:.2f}s)", file=sys.stderr)
+        raw = assemble(state, N, nx, mult, xs, nt, pool, workers)
+    finally:
+        if pool is not None:
+            pool.shutdown()
+    if verbose:
+        print(f"  assembled ({time.time() - t0:.2f}s)", file=sys.stderr)
+    return xs, raw
+
+
+def hilbert_series(N, d, equal_x=False, workers=1, verbose=False):
+    """Hilbert series of d N x N matrices under simultaneous conjugation.
+
+    equal_x=False: returns (Z, Z with all x_i = x) with Z in x1..xd
+                   (the second entry is None for d == 1, where Z already is that).
+    equal_x=True : all x_i = x from the start; returns (None, Z(x)).
+    workers      : 1 = serial; k > 1 = pool of k processes; 0 = all cores."""
+    single = equal_x or d == 1
+    xs, raw = molien_weyl_raw(N, d, equal_x, workers, verbose)
+    mono_expr, numer, denom = raw_to_expr(xs, raw)
+    if N == 1:
+        Z = mono_expr * numer / denom
     else:
-        nt = N - 1
-        L = nt + nx
-        t0 = time.time()
-        pool = None
-        if workers > 1:
-            from concurrent.futures import ProcessPoolExecutor
-            pool = ProcessPoolExecutor(max_workers=workers)
-        try:
-            state = initial_state(N, nx, mult)
-            for j in range(nt):
-                state = integrate_variable(state, j, L, nt, nx, pool, workers)
-                if verbose:
-                    print(f"  integrated t{j + 1}: {len(state)} terms "
-                          f"({time.time() - t0:.2f}s)", file=sys.stderr)
-            mono_expr, numer, denom = assemble(state, N, nx, mult, xs, nt, pool, workers)
-        finally:
-            if pool is not None:
-                pool.shutdown()
-        if verbose:
-            print(f"  assembled ({time.time() - t0:.2f}s)", file=sys.stderr)
         Z = sp.factor(numer) * mono_expr / denom        # numerator and denominator are coprime
     if single:
         return (None, Z) if equal_x else (Z, None)
@@ -882,6 +907,260 @@ def free_trace_series(d, n):
             b.append(b[-1] * (ck + j - 1) // j)
         s = [sum(b[j] * s[i - j * k] for j in range(i // k + 1)) for i in range(n + 1)]
     return s
+
+
+# ---------------------------------------------------------------------------
+# Section 8: forms in the matrix (species) grading
+# ---------------------------------------------------------------------------
+# In d variables every irreducible factor of the reduced denominator is
+# +- Phi_j(x^beta) for a primitive exponent vector beta (a "ray"), because each
+# binomial 1 - x^(k beta) factors as prod_{j | k} Phi_j(x^beta).  A denominator
+# made of binomials therefore splits ray by ray, and on each ray the problem is
+# the univariate covering problem of Section 7.  A species-graded system of
+# primary invariants gives such a denominator with exactly D factors, so
+#     F_min = sum over rays of a_{beta,1}  (the multiplicity of Phi_1(x^beta))
+# is a lower bound for the number of factors: if F_min > D, no system of
+# primary invariants homogeneous in every species exists, of any degrees.
+# When F > D the numerator vanishes at x_1 = ... = x_d = 1 to order F - D.
+
+def _ray_of(g):
+    """(beta, j, sign) with g = sign * Phi_j(x^beta)."""
+    nonconst = [m for m in g if any(m)]
+    top = max(nonconst, key=sum)
+    gt = 0
+    for c in top:
+        gt = math.gcd(gt, c)
+    beta = tuple(c // gt for c in top)
+    uni = {}
+    for m, c in g.items():
+        k = sum(m) // sum(beta)
+        if tuple(k * b for b in beta) != m:
+            raise ValueError(f"factor {g} is not a polynomial in a single monomial")
+        uni[k] = c
+    deg = max(uni)
+    coeffs = [uni.get(k, 0) for k in range(deg + 1)]
+    for j in range(1, 2 * deg * deg + 3):
+        if sp.totient(j) != deg:
+            continue
+        cj = _cyclotomic_coeffs(j)
+        if coeffs == cj:
+            return beta, j, 1
+        if coeffs == [-c for c in cj]:
+            return beta, j, -1
+    raise ValueError(f"factor {g} is not cyclotomic in x^{beta}")
+
+
+def _cyclotomic_coeffs(j):
+    y = sp.Symbol("y")
+    return [int(c) for c in reversed(sp.Poly(sp.cyclotomic_poly(j, y), y).all_coeffs())]
+
+
+def ray_covers(a, count=None, max_ratio=1):
+    """Multisets {k: m} of `count` multipliers (default a_1) such that, for every
+    j, at least a_j of them are multiples of j; i.e. prod (1 - y^k)^m is divisible
+    by prod Phi_j(y)^{a_j}.  Returns the covers with product <= max_ratio * the
+    minimum, sorted by (product, sum).  For max_ratio = 1 only k = lcm of a set of
+    j's can occur (any other k can be lowered to such an lcm)."""
+    if count is None:
+        count = a.get(1, 0)
+    J = sorted(j for j in a if j > 1)
+    lcms = {1}
+    for r in range(1, len(J) + 1):
+        for S in itertools.combinations(J, r):
+            lcms.add(math.lcm(*S))
+
+    def search(cands, bound):
+        found = []
+
+        def rec(i, left, chosen, prod):
+            if left == 0:
+                if all(sum(m for k, m in chosen.items() if k % j == 0) >= a[j] for j in J):
+                    found.append(dict(chosen))
+                return
+            if i == len(cands) or (bound is not None and prod * cands[i] ** left > bound):
+                return
+            k = cands[i]
+            for m in range(left, -1, -1):
+                if bound is not None and prod * k ** m > bound:
+                    continue
+                if m:
+                    chosen[k] = m
+                rec(i + 1, left - m, chosen, prod * k ** m)
+                chosen.pop(k, None)
+
+        rec(0, count, {}, 1)
+        return found
+
+    key = lambda c: (math.prod(k ** m for k, m in c.items()), sum(k * m for k, m in c.items()))
+    found = search(sorted(lcms), None)
+    if not found:
+        return ray_covers(a, count + 1, max_ratio)
+    pmin = min(key(c)[0] for c in found)
+    if max_ratio > 1:
+        found = search(list(range(1, max_ratio * pmin + 1)), max_ratio * pmin)
+    found.sort(key=key)
+    return [c for c in found if key(c)[0] <= max_ratio * pmin]
+
+
+def _best_first(options, cost):
+    """Yield combinations (one entry per options list, each list sorted by
+    increasing per-entry cost) in order of increasing total cost = product of
+    per-entry costs."""
+    import heapq
+    start = (0,) * len(options)
+    heap = [(math.prod(cost(i, 0) for i in range(len(options))), start)]
+    seen = {start}
+    while heap:
+        c, idx = heapq.heappop(heap)
+        yield tuple(options[i][k] for i, k in enumerate(idx))
+        for i in range(len(options)):
+            if idx[i] + 1 < len(options[i]):
+                nxt = idx[:i] + (idx[i] + 1,) + idx[i + 1:]
+                if nxt not in seen:
+                    seen.add(nxt)
+                    heapq.heappush(heap, (math.prod(cost(t, nxt[t]) for t in range(len(options))), nxt))
+
+
+class SpeciesForm:
+    """Z(x_1..x_d) = numerator / prod_(alpha, m) (1 - x^alpha)^m."""
+
+    def __init__(self, nx, factors, numerator, krull_dim, admissible=None):
+        self.nx = nx
+        self.factors = factors              # list of (alpha, m)
+        self.numerator = numerator          # {exponent tuple: int}
+        self.krull_dim = krull_dim
+        self.admissible = admissible        # None if not checked
+
+    @property
+    def num_factors(self):
+        return sum(m for _, m in self.factors)
+
+    @property
+    def nonnegative(self):
+        return all(c >= 0 for c in self.numerator.values())
+
+    def at_one(self):
+        return sum(self.numerator.values())
+
+    def specialise(self):
+        """The same form with all x_i = x: (numerator list, {degree: multiplicity})."""
+        n = max(sum(m) for m in self.numerator) + 1
+        p = [0] * n
+        for m, c in self.numerator.items():
+            p[sum(m)] += c
+        degs = {}
+        for alpha, m in self.factors:
+            degs[sum(alpha)] = degs.get(sum(alpha), 0) + m
+        return p, dict(sorted(degs.items()))
+
+    def orbits(self, perm_group=None):
+        """Numerator terms grouped by orbit under permutations of the variables:
+        {sorted exponent tuple: (coefficient, orbit size)}.  The coefficient is
+        checked to be constant on each orbit (the series is symmetric)."""
+        out = {}
+        for m, c in self.numerator.items():
+            key = tuple(sorted(m, reverse=True))
+            if key in out:
+                c0, n = out[key]
+                if c0 != c:
+                    raise ValueError("numerator is not symmetric")
+                out[key] = (c0, n + 1)
+            else:
+                out[key] = (c, 1)
+        return out
+
+
+def _series_box(form, box):
+    """Coefficients of Z inside the box prod [0, box_i], from the form."""
+    h = {m: c for m, c in form.numerator.items() if all(u <= b for u, b in zip(m, box))}
+    for alpha, mult in form.factors:
+        for _ in range(mult):
+            # multiply by 1/(1 - x^alpha): h[m] += h[m - alpha], in increasing order
+            for m in sorted(itertools.product(*[range(b + 1) for b in box]), key=sum):
+                prev = tuple(u - a for u, a in zip(m, alpha))
+                if min(prev) >= 0 and prev in h:
+                    h[m] = h.get(m, 0) + h[prev]
+    return h
+
+
+def species_form(raw, krull_dim, check=True, max_tries=20000):
+    """Simplest binomial form of a multigraded series in lowest terms.
+
+    raw = (smin, num, den) from `molien_weyl_raw`.  Per ray the fewest factors,
+    then the smallest product of degrees, then the smallest degree sum.  If the
+    total number of factors equals the Krull dimension (a species-graded
+    Hironaka form is possible), combinations of per-ray covers are tried in order
+    of increasing P(1) until one is admissible (0 <= P_alpha <= h_alpha)."""
+    smin, num, den = raw
+    nx = len(smin)
+    rays, sign = {}, 1
+    for g, e in den:
+        beta, j, s = _ray_of(g)
+        rays.setdefault(beta, {})
+        rays[beta][j] = rays[beta].get(j, 0) + e
+        if s < 0 and e & 1:
+            sign = -sign
+    beta_list = sorted(rays, key=lambda b: (sum(b), tuple(-u for u in b)))
+    F_min = sum(rays[b].get(1, 0) for b in beta_list)
+    possible = check and F_min == krull_dim
+    options = [ray_covers(rays[b], max_ratio=8 if possible else 1) for b in beta_list]
+
+    def build(choice):
+        poly = {tuple(u + v for u, v in zip(m, smin)): sign * c for m, c in num.items()}
+        factors = []
+        for b, cover in zip(beta_list, choice):
+            p = [1]
+            for k, m in cover.items():
+                for _ in range(m):
+                    p = _poly_mul_binomial(p, k)
+                factors.append((tuple(k * u for u in b), m))
+            q = [1]
+            for j, aj in rays[b].items():
+                for _ in range(aj):
+                    q = _poly_mul_binomial(q, 1) if j == 1 else _poly_mul_cyclo(q, j)
+            quo = _poly_exact_div(p, q)
+            new = {}
+            for m, c in poly.items():
+                for k, qc in enumerate(quo):
+                    if qc:
+                        t = tuple(u + k * v for u, v in zip(m, b))
+                        new[t] = new.get(t, 0) + c * qc
+            poly = {m: c for m, c in new.items() if c}
+        # Phi_1(y) = y - 1 = -(1 - y): each Phi_1 was multiplied in as (1 - y)
+        n1 = sum(rays[b].get(1, 0) for b in beta_list)
+        if n1 & 1:
+            poly = {m: -c for m, c in poly.items()}
+        return SpeciesForm(nx, factors, poly, krull_dim)
+
+    # cost of a cover on ray b: product of the total degrees k*|b| of its factors,
+    # so the total cost is P(1) / e of the specialised form
+    cost = lambda i, k: math.prod((kk * sum(beta_list[i])) ** m for kk, m in options[i][k].items())
+    combos = _best_first(options, cost)
+    if not possible:
+        return build(next(combos))
+    first = None
+    for n_tried, ch in enumerate(combos):
+        if n_tried >= max_tries:
+            break
+        form = build(ch)
+        first = first or form
+        if form.nonnegative:
+            box = [max(m[i] for m in form.numerator) for i in range(nx)]
+            h = _series_box(form, box)
+            form.admissible = all(c <= h.get(m, 0) for m, c in form.numerator.items())
+            if form.admissible:
+                return form
+    first.admissible = False
+    return first
+
+
+def _poly_mul_cyclo(p, j):
+    c = _cyclotomic_coeffs(j)
+    out = [0] * (len(p) + len(c) - 1)
+    for i, u in enumerate(p):
+        for k, v in enumerate(c):
+            out[i + k] += u * v
+    return out
 
 
 def first_difference(a, b):
