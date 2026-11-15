@@ -118,6 +118,47 @@ def species_row(N, d):
     return row
 
 
+# ------------------------------------------------- forms quoted in arXiv:2503.20097
+
+def _sym_factors(d):
+    e = lambda *idx: tuple(sum(1 for i in idx if i == a) for a in range(d))
+    return ([[list(e(a)), 1] for a in range(d)] + [[list(e(a, a)), 1] for a in range(d)]
+            + [[list(e(a, b)), 1] for a in range(d) for b in range(a + 1, d)])
+
+
+def _paper_n2_d4():
+    num = {(0, 0, 0, 0): 1, (2, 2, 2, 2): -1}
+    for a in range(4):
+        num[tuple(0 if i == a else 1 for i in range(4))] = 1
+        num[tuple(2 if i == a else 1 for i in range(4))] = -1
+    return [[list(m), c] for m, c in num.items()]
+
+
+PAPER_N2_SPECIES = {   # d: (equation, factors, numerator)
+    1: ("(3.5) with N = 2", [[[1], 1], [[2], 1]], [[[0], 1]]),
+    2: ("(3.14)", _sym_factors(2), [[[0, 0], 1]]),
+    3: ("(3.24)", _sym_factors(3), [[[0, 0, 0], 1], [[1, 1, 1], 1]]),
+    4: ("(3.35)-(3.36)", _sym_factors(4), _paper_n2_d4()),
+}
+PAPER_N2_EQUAL = {     # d: (equation, numerator, degrees)
+    1: ("(3.5) with N = 2", [1], {"1": 1, "2": 1}),
+    4: ("(3.39)", [1, 0, 1, 4, 1, 0, 1], {"1": 4, "2": 9}),
+}
+PAPER_D2_EQUAL_EQ = {2: "(3.14) with x = y", 3: "(3.40) with x = y", 4: "(3.46)-(3.47)",
+                     5: "(3.48)-(3.49)", 6: "(3.51)-(3.52)"}
+PAPER_D2_SPECIES = {   # N: (equation, factors, numerator)
+    2: ("(3.14)", _sym_factors(2), [[[0, 0], 1]]),
+    3: ("(3.40)", [[[1, 0], 1], [[0, 1], 1], [[2, 0], 1], [[1, 1], 1], [[0, 2], 1],
+                   [[3, 0], 1], [[2, 1], 1], [[1, 2], 1], [[0, 3], 1], [[2, 2], 1]],
+        [[[0, 0], 1], [[3, 3], 1]]),
+}
+
+
+def same_species_form(f1, n1, f2, n2):
+    key = lambda fs: sorted((tuple(a), m) for a, m in fs)
+    return key(f1) == key(f2) and {tuple(m): c for m, c in n1} == {tuple(m): c for m, c in n2}
+
+
 # -------------------------------------------------------------------- markdown
 
 def fmt_coeffs(c):
@@ -164,29 +205,41 @@ def poly_terms(numerator, names):
     return out
 
 
+def species_lines(factors, numerator, names, inline, fname=None):
+    L = ["  denominator: " + " ".join(
+        f"(1-{mono(a, names)})" + (f"^{m}" if m > 1 else "") for a, m in factors)]
+    L.append("  " + max_degrees(numerator, names))
+    numerator = sorted(numerator, key=lambda t: (sum(t[0]), [-u for u in t[0]]))
+    terms = poly_terms(numerator, names)
+    if inline:
+        L.append("  numerator:   " + " ".join(terms))
+    else:
+        with open(os.path.join(DATA, fname), "w") as f:
+            f.write("\n".join(terms) + "\n")
+        L.append(f"  numerator:   {len(terms)} terms, one per line in data/{fname}")
+    return L
+
+
+def paper_species_lines(paper, ours_f, ours_n, names):
+    if paper is None:
+        return ["paper: not given in arXiv:2503.20097"]
+    eq, pf, pn = paper
+    same = same_species_form(pf, pn, ours_f, ours_n)
+    return ([f"paper, eq. {eq}" + (" (identical to ours):" if same else " (DIFFERENT):")]
+            + species_lines(pf, pn, names, True))
+
+
 def md_species_n2(rows, inline_max=5):
     L = ["## 1. N = 2, d = 1..7, matrix grading", "",
          "One variable per matrix: x, y, z, w, u, v, t.", ""]
     for r in rows:
         d = r["d"]
         names = VARS[:d]
-        L.append(f"### d = {d}")
-        L.append("")
-        L.append("```")
-        L.append("denominator: " + " ".join(
-            f"(1-{mono(a, names)})" + (f"^{m}" if m > 1 else "") for a, m in r["factors"]))
-        terms = poly_terms(r["numerator"], names)
-        L.append(max_degrees(r["numerator"], names))
-        if d <= inline_max:
-            L.append("numerator:   " + " ".join(terms))
-            L.append("```")
-        else:
-            fname = f"n2_d{d}_numerator.txt"
-            with open(os.path.join(DATA, fname), "w") as f:
-                f.write("\n".join(terms) + "\n")
-            L.append(f"numerator:   {len(terms)} terms, one per line in data/{fname}")
-            L.append("```")
-        L.append("")
+        L += [f"### d = {d}", "", "```", "ours:"]
+        L += species_lines(r["factors"], r["numerator"], names, d <= inline_max,
+                           f"n2_d{d}_numerator.txt")
+        L += [""] + paper_species_lines(PAPER_N2_SPECIES.get(d), r["factors"], r["numerator"], names)
+        L += ["```", ""]
     return L
 
 
@@ -194,49 +247,71 @@ def md_equal_n2(rows):
     L = ["## 2. N = 2, d = 1..18, all species equal", "",
          "Numerator coefficients from degree 0 upwards.", "", "```"]
     for r in rows:
-        L += equal_block(f"d = {r['d']}", r["numerator"], r["degrees"])
+        L += equal_block(f"d = {r['d']}, ours (P(1) = {r['secondaries']})",
+                         r["numerator"], r["degrees"])
+        if r["d"] in PAPER_N2_EQUAL:
+            eq, pn, pd = PAPER_N2_EQUAL[r["d"]]
+            same = pn == r["numerator"] and pd == r["degrees"]
+            L += equal_block(f"d = {r['d']}, paper, eq. {eq}"
+                             + (" (identical to ours)" if same else " (DIFFERENT)"), pn, pd)
+        else:
+            L += [f"d = {r['d']}, paper: not given in arXiv:2503.20097", ""]
     L += ["```", ""]
     return L
 
 
 def md_equal_d2(rows):
     L = ["## 3. d = 2, N = 2..6, all species equal", "",
-         "Numerator coefficients from degree 0 upwards.  `fewest secondaries` = the "
-         "admissible choice with the smallest P(1); `paper` = the denominators of "
-         "arXiv:2503.20097.  Both are the same Z(x).", "", "```"]
+         "Numerator coefficients from degree 0 upwards.  `ours` = the admissible choice "
+         "with the fewest secondaries.  Both forms are the same Z(x).", "", "```"]
     for r in rows:
-        L += equal_block(f"N = {r['N']}, fewest secondaries (P(1) = {r['min']['secondaries']})",
+        L += equal_block(f"N = {r['N']}, ours (P(1) = {r['min']['secondaries']})",
                          r["min"]["numerator"], r["min"]["degrees"])
-        if r["paper"]["degrees"] != r["min"]["degrees"]:
-            L += equal_block(f"N = {r['N']}, paper (P(1) = {r['paper']['secondaries']})",
-                             r["paper"]["numerator"], r["paper"]["degrees"])
+        same = r["paper"]["degrees"] == r["min"]["degrees"]
+        L += equal_block(f"N = {r['N']}, paper, eq. {PAPER_D2_EQUAL_EQ[r['N']]} "
+                         f"(P(1) = {r['paper']['secondaries']})"
+                         + (" (identical to ours)" if same else ""),
+                         r["paper"]["numerator"], r["paper"]["degrees"])
     L += ["```", ""]
     return L
 
 
+def grid_lines(numerator):
+    I = max(m[0] for m, _ in numerator)
+    J = max(m[1] for m, _ in numerator)
+    G = [[0] * (J + 1) for _ in range(I + 1)]
+    for (i, j), c in numerator:
+        G[i][j] = c
+    w = max(max(len(str(c)) for row in G for c in row), len(str(J))) + 1
+    L = ["  numerator (row i = power of x, column j = power of y):",
+         "  i\\j" + "".join(f"{j:>{w}}" for j in range(J + 1))]
+    for i, row in enumerate(G):
+        L.append(f"  {i:>3}" + "".join(f"{c:>{w}}" for c in row))
+    return L
+
+
+def bigraded_lines(factors, numerator):
+    num = [(tuple(m), c) for m, c in numerator]
+    return (["  denominator: " + " ".join(
+        f"(1-{mono(a, ['x', 'y'])})" + (f"^{m}" if m > 1 else "") for a, m in factors)]
+        + ["  " + max_degrees(num, ["x", "y"])] + grid_lines(num))
+
+
 def md_species_d2(rows):
-    L = ["## 4. d = 2, N = 2..5, matrix grading", "",
-         "Numerator grid: row i = power of x, column j = power of y.", ""]
+    L = ["## 4. d = 2, N = 2..5, matrix grading", ""]
     for r in rows:
-        L.append(f"### N = {r['N']}")
+        L += [f"### N = {r['N']}", "", "```", "ours:"]
+        L += bigraded_lines(r["factors"], r["numerator"])
         L.append("")
-        L.append("```")
-        L.append("denominator: " + " ".join(
-            f"(1-{mono(a, ['x', 'y'])})" + (f"^{m}" if m > 1 else "") for a, m in r["factors"]))
-        num = [(tuple(m), c) for m, c in r["numerator"]]
-        L.append(max_degrees(num, ["x", "y"]))
-        L.append("numerator:")
-        I = max(m[0] for m, _ in num)
-        J = max(m[1] for m, _ in num)
-        G = [[0] * (J + 1) for _ in range(I + 1)]
-        for (i, j), c in num:
-            G[i][j] = c
-        w = max(max(len(str(c)) for row in G for c in row), len(str(J))) + 1
-        L.append("i\\j" + "".join(f"{j:>{w}}" for j in range(J + 1)))
-        for i, row in enumerate(G):
-            L.append(f"{i:>3}" + "".join(f"{c:>{w}}" for c in row))
-        L.append("```")
-        L.append("")
+        paper = PAPER_D2_SPECIES.get(r["N"])
+        if paper is None:
+            L.append("paper: not given in arXiv:2503.20097")
+        else:
+            eq, pf, pn = paper
+            same = same_species_form(pf, pn, r["factors"], r["numerator"])
+            L.append(f"paper, eq. {eq}" + (" (identical to ours):" if same else " (DIFFERENT):"))
+            L += bigraded_lines(pf, pn)
+        L += ["```", ""]
     return L
 
 
