@@ -16,6 +16,15 @@ Optional LLM (any OpenAI-compatible endpoint): `FINN_LLM_API_KEY`, `FINN_LLM_BAS
 
 Tests: `python3 -m pytest backend/tests`. Refresh the offline fallback snapshot: `python3 scripts/refresh_snapshot.py`.
 
+
+## Deploy (Render)
+
+One-click via Blueprint: on [render.com](https://render.com) → **New** → **Blueprint** → connect this repo → select branch `cursor/finn-investment-agent-a22f` → apply `render.yaml`.
+
+Or manually: **New Web Service** → Docker → this repo. Render will build the `Dockerfile` and expose `$PORT`. Optional secrets: `FINN_LLM_API_KEY` (and the other `FINN_LLM_*` vars if you want a non-OpenAI endpoint).
+
+Same image works on **Railway** / **Fly.io** (`fly launch` / Railway Docker deploy). After deploy, open the public URL on a phone — that link goes in the ENAM submission email.
+
 ## Interaction model
 
 One screen of judgment, one command bar.
