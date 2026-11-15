@@ -201,9 +201,15 @@ def md_equal_n2(rows):
 
 def md_equal_d2(rows):
     L = ["## 3. d = 2, N = 2..6, all species equal", "",
-         "Numerator coefficients from degree 0 upwards.", "", "```"]
+         "Numerator coefficients from degree 0 upwards.  `fewest secondaries` = the "
+         "admissible choice with the smallest P(1); `paper` = the denominators of "
+         "arXiv:2503.20097.  Both are the same Z(x).", "", "```"]
     for r in rows:
-        L += equal_block(f"N = {r['N']}", r["min"]["numerator"], r["min"]["degrees"])
+        L += equal_block(f"N = {r['N']}, fewest secondaries (P(1) = {r['min']['secondaries']})",
+                         r["min"]["numerator"], r["min"]["degrees"])
+        if r["paper"]["degrees"] != r["min"]["degrees"]:
+            L += equal_block(f"N = {r['N']}, paper (P(1) = {r['paper']['secondaries']})",
+                             r["paper"]["numerator"], r["paper"]["degrees"])
     L += ["```", ""]
     return L
 
