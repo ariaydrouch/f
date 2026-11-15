@@ -1,0 +1,1301 @@
+1
++ x y z
++ x y w
++ x y u
++ x y v
++ x z w
++ x z u
++ x z v
++ x w u
++ x w v
++ x u v
++ y z w
++ y z u
++ y z v
++ y w u
++ y w v
++ y u v
++ z w u
++ z w v
++ z u v
++ w u v
+- x^2 y z w
+- x^2 y z u
+- x^2 y z v
+- x^2 y w u
+- x^2 y w v
+- x^2 y u v
+- x^2 z w u
+- x^2 z w v
+- x^2 z u v
+- x^2 w u v
+- x y^2 z w
+- x y^2 z u
+- x y^2 z v
+- x y^2 w u
+- x y^2 w v
+- x y^2 u v
+- x y z^2 w
+- x y z^2 u
+- x y z^2 v
+- x y z w^2
+- 4 x y z w u
+- 4 x y z w v
+- x y z u^2
+- 4 x y z u v
+- x y z v^2
+- x y w^2 u
+- x y w^2 v
+- x y w u^2
+- 4 x y w u v
+- x y w v^2
+- x y u^2 v
+- x y u v^2
+- x z^2 w u
+- x z^2 w v
+- x z^2 u v
+- x z w^2 u
+- x z w^2 v
+- x z w u^2
+- 4 x z w u v
+- x z w v^2
+- x z u^2 v
+- x z u v^2
+- x w^2 u v
+- x w u^2 v
+- x w u v^2
+- y^2 z w u
+- y^2 z w v
+- y^2 z u v
+- y^2 w u v
+- y z^2 w u
+- y z^2 w v
+- y z^2 u v
+- y z w^2 u
+- y z w^2 v
+- y z w u^2
+- 4 y z w u v
+- y z w v^2
+- y z u^2 v
+- y z u v^2
+- y w^2 u v
+- y w u^2 v
+- y w u v^2
+- z^2 w u v
+- z w^2 u v
+- z w u^2 v
+- z w u v^2
++ x^3 y z w u
++ x^3 y z w v
++ x^3 y z u v
++ x^3 y w u v
++ x^3 z w u v
++ x^2 y^2 z w u
++ x^2 y^2 z w v
++ x^2 y^2 z u v
++ x^2 y^2 w u v
++ x^2 y z^2 w u
++ x^2 y z^2 w v
++ x^2 y z^2 u v
++ x^2 y z w^2 u
++ x^2 y z w^2 v
++ x^2 y z w u^2
++ 5 x^2 y z w u v
++ x^2 y z w v^2
++ x^2 y z u^2 v
++ x^2 y z u v^2
++ x^2 y w^2 u v
++ x^2 y w u^2 v
++ x^2 y w u v^2
++ x^2 z^2 w u v
++ x^2 z w^2 u v
++ x^2 z w u^2 v
++ x^2 z w u v^2
++ x y^3 z w u
++ x y^3 z w v
++ x y^3 z u v
++ x y^3 w u v
++ x y^2 z^2 w u
++ x y^2 z^2 w v
++ x y^2 z^2 u v
++ x y^2 z w^2 u
++ x y^2 z w^2 v
++ x y^2 z w u^2
++ 5 x y^2 z w u v
++ x y^2 z w v^2
++ x y^2 z u^2 v
++ x y^2 z u v^2
++ x y^2 w^2 u v
++ x y^2 w u^2 v
++ x y^2 w u v^2
++ x y z^3 w u
++ x y z^3 w v
++ x y z^3 u v
++ x y z^2 w^2 u
++ x y z^2 w^2 v
++ x y z^2 w u^2
++ 5 x y z^2 w u v
++ x y z^2 w v^2
++ x y z^2 u^2 v
++ x y z^2 u v^2
++ x y z w^3 u
++ x y z w^3 v
++ x y z w^2 u^2
++ 5 x y z w^2 u v
++ x y z w^2 v^2
++ x y z w u^3
++ 5 x y z w u^2 v
++ 5 x y z w u v^2
++ x y z w v^3
++ x y z u^3 v
++ x y z u^2 v^2
++ x y z u v^3
++ x y w^3 u v
++ x y w^2 u^2 v
++ x y w^2 u v^2
++ x y w u^3 v
++ x y w u^2 v^2
++ x y w u v^3
++ x z^3 w u v
++ x z^2 w^2 u v
++ x z^2 w u^2 v
++ x z^2 w u v^2
++ x z w^3 u v
++ x z w^2 u^2 v
++ x z w^2 u v^2
++ x z w u^3 v
++ x z w u^2 v^2
++ x z w u v^3
++ y^3 z w u v
++ y^2 z^2 w u v
++ y^2 z w^2 u v
++ y^2 z w u^2 v
++ y^2 z w u v^2
++ y z^3 w u v
++ y z^2 w^2 u v
++ y z^2 w u^2 v
++ y z^2 w u v^2
++ y z w^3 u v
++ y z w^2 u^2 v
++ y z w^2 u v^2
++ y z w u^3 v
++ y z w u^2 v^2
++ y z w u v^3
+- x^2 y^2 z^2 w^2
+- x^2 y^2 z^2 w u
+- x^2 y^2 z^2 w v
+- x^2 y^2 z^2 u^2
+- x^2 y^2 z^2 u v
+- x^2 y^2 z^2 v^2
+- x^2 y^2 z w^2 u
+- x^2 y^2 z w^2 v
+- x^2 y^2 z w u^2
+- 2 x^2 y^2 z w u v
+- x^2 y^2 z w v^2
+- x^2 y^2 z u^2 v
+- x^2 y^2 z u v^2
+- x^2 y^2 w^2 u^2
+- x^2 y^2 w^2 u v
+- x^2 y^2 w^2 v^2
+- x^2 y^2 w u^2 v
+- x^2 y^2 w u v^2
+- x^2 y^2 u^2 v^2
+- x^2 y z^2 w^2 u
+- x^2 y z^2 w^2 v
+- x^2 y z^2 w u^2
+- 2 x^2 y z^2 w u v
+- x^2 y z^2 w v^2
+- x^2 y z^2 u^2 v
+- x^2 y z^2 u v^2
+- x^2 y z w^2 u^2
+- 2 x^2 y z w^2 u v
+- x^2 y z w^2 v^2
+- 2 x^2 y z w u^2 v
+- 2 x^2 y z w u v^2
+- x^2 y z u^2 v^2
+- x^2 y w^2 u^2 v
+- x^2 y w^2 u v^2
+- x^2 y w u^2 v^2
+- x^2 z^2 w^2 u^2
+- x^2 z^2 w^2 u v
+- x^2 z^2 w^2 v^2
+- x^2 z^2 w u^2 v
+- x^2 z^2 w u v^2
+- x^2 z^2 u^2 v^2
+- x^2 z w^2 u^2 v
+- x^2 z w^2 u v^2
+- x^2 z w u^2 v^2
+- x^2 w^2 u^2 v^2
+- x y^2 z^2 w^2 u
+- x y^2 z^2 w^2 v
+- x y^2 z^2 w u^2
+- 2 x y^2 z^2 w u v
+- x y^2 z^2 w v^2
+- x y^2 z^2 u^2 v
+- x y^2 z^2 u v^2
+- x y^2 z w^2 u^2
+- 2 x y^2 z w^2 u v
+- x y^2 z w^2 v^2
+- 2 x y^2 z w u^2 v
+- 2 x y^2 z w u v^2
+- x y^2 z u^2 v^2
+- x y^2 w^2 u^2 v
+- x y^2 w^2 u v^2
+- x y^2 w u^2 v^2
+- x y z^2 w^2 u^2
+- 2 x y z^2 w^2 u v
+- x y z^2 w^2 v^2
+- 2 x y z^2 w u^2 v
+- 2 x y z^2 w u v^2
+- x y z^2 u^2 v^2
+- 2 x y z w^2 u^2 v
+- 2 x y z w^2 u v^2
+- 2 x y z w u^2 v^2
+- x y w^2 u^2 v^2
+- x z^2 w^2 u^2 v
+- x z^2 w^2 u v^2
+- x z^2 w u^2 v^2
+- x z w^2 u^2 v^2
+- y^2 z^2 w^2 u^2
+- y^2 z^2 w^2 u v
+- y^2 z^2 w^2 v^2
+- y^2 z^2 w u^2 v
+- y^2 z^2 w u v^2
+- y^2 z^2 u^2 v^2
+- y^2 z w^2 u^2 v
+- y^2 z w^2 u v^2
+- y^2 z w u^2 v^2
+- y^2 w^2 u^2 v^2
+- y z^2 w^2 u^2 v
+- y z^2 w^2 u v^2
+- y z^2 w u^2 v^2
+- y z w^2 u^2 v^2
+- z^2 w^2 u^2 v^2
+- x^4 y z w u v
+- x^3 y^2 z w u v
+- x^3 y z^2 w u v
+- x^3 y z w^2 u v
+- x^3 y z w u^2 v
+- x^3 y z w u v^2
+- x^2 y^3 z w u v
+- x^2 y^2 z^2 w u v
+- x^2 y^2 z w^2 u v
+- x^2 y^2 z w u^2 v
+- x^2 y^2 z w u v^2
+- x^2 y z^3 w u v
+- x^2 y z^2 w^2 u v
+- x^2 y z^2 w u^2 v
+- x^2 y z^2 w u v^2
+- x^2 y z w^3 u v
+- x^2 y z w^2 u^2 v
+- x^2 y z w^2 u v^2
+- x^2 y z w u^3 v
+- x^2 y z w u^2 v^2
+- x^2 y z w u v^3
+- x y^4 z w u v
+- x y^3 z^2 w u v
+- x y^3 z w^2 u v
+- x y^3 z w u^2 v
+- x y^3 z w u v^2
+- x y^2 z^3 w u v
+- x y^2 z^2 w^2 u v
+- x y^2 z^2 w u^2 v
+- x y^2 z^2 w u v^2
+- x y^2 z w^3 u v
+- x y^2 z w^2 u^2 v
+- x y^2 z w^2 u v^2
+- x y^2 z w u^3 v
+- x y^2 z w u^2 v^2
+- x y^2 z w u v^3
+- x y z^4 w u v
+- x y z^3 w^2 u v
+- x y z^3 w u^2 v
+- x y z^3 w u v^2
+- x y z^2 w^3 u v
+- x y z^2 w^2 u^2 v
+- x y z^2 w^2 u v^2
+- x y z^2 w u^3 v
+- x y z^2 w u^2 v^2
+- x y z^2 w u v^3
+- x y z w^4 u v
+- x y z w^3 u^2 v
+- x y z w^3 u v^2
+- x y z w^2 u^3 v
+- x y z w^2 u^2 v^2
+- x y z w^2 u v^3
+- x y z w u^4 v
+- x y z w u^3 v^2
+- x y z w u^2 v^3
+- x y z w u v^4
++ x^3 y^2 z^2 w^2 u
++ x^3 y^2 z^2 w^2 v
++ x^3 y^2 z^2 w u^2
++ 2 x^3 y^2 z^2 w u v
++ x^3 y^2 z^2 w v^2
++ x^3 y^2 z^2 u^2 v
++ x^3 y^2 z^2 u v^2
++ x^3 y^2 z w^2 u^2
++ 2 x^3 y^2 z w^2 u v
++ x^3 y^2 z w^2 v^2
++ 2 x^3 y^2 z w u^2 v
++ 2 x^3 y^2 z w u v^2
++ x^3 y^2 z u^2 v^2
++ x^3 y^2 w^2 u^2 v
++ x^3 y^2 w^2 u v^2
++ x^3 y^2 w u^2 v^2
++ x^3 y z^2 w^2 u^2
++ 2 x^3 y z^2 w^2 u v
++ x^3 y z^2 w^2 v^2
++ 2 x^3 y z^2 w u^2 v
++ 2 x^3 y z^2 w u v^2
++ x^3 y z^2 u^2 v^2
++ 2 x^3 y z w^2 u^2 v
++ 2 x^3 y z w^2 u v^2
++ 2 x^3 y z w u^2 v^2
++ x^3 y w^2 u^2 v^2
++ x^3 z^2 w^2 u^2 v
++ x^3 z^2 w^2 u v^2
++ x^3 z^2 w u^2 v^2
++ x^3 z w^2 u^2 v^2
++ x^2 y^3 z^2 w^2 u
++ x^2 y^3 z^2 w^2 v
++ x^2 y^3 z^2 w u^2
++ 2 x^2 y^3 z^2 w u v
++ x^2 y^3 z^2 w v^2
++ x^2 y^3 z^2 u^2 v
++ x^2 y^3 z^2 u v^2
++ x^2 y^3 z w^2 u^2
++ 2 x^2 y^3 z w^2 u v
++ x^2 y^3 z w^2 v^2
++ 2 x^2 y^3 z w u^2 v
++ 2 x^2 y^3 z w u v^2
++ x^2 y^3 z u^2 v^2
++ x^2 y^3 w^2 u^2 v
++ x^2 y^3 w^2 u v^2
++ x^2 y^3 w u^2 v^2
++ x^2 y^2 z^3 w^2 u
++ x^2 y^2 z^3 w^2 v
++ x^2 y^2 z^3 w u^2
++ 2 x^2 y^2 z^3 w u v
++ x^2 y^2 z^3 w v^2
++ x^2 y^2 z^3 u^2 v
++ x^2 y^2 z^3 u v^2
++ x^2 y^2 z^2 w^3 u
++ x^2 y^2 z^2 w^3 v
++ 4 x^2 y^2 z^2 w^2 u^2
++ 8 x^2 y^2 z^2 w^2 u v
++ 4 x^2 y^2 z^2 w^2 v^2
++ x^2 y^2 z^2 w u^3
++ 8 x^2 y^2 z^2 w u^2 v
++ 8 x^2 y^2 z^2 w u v^2
++ x^2 y^2 z^2 w v^3
++ x^2 y^2 z^2 u^3 v
++ 4 x^2 y^2 z^2 u^2 v^2
++ x^2 y^2 z^2 u v^3
++ x^2 y^2 z w^3 u^2
++ 2 x^2 y^2 z w^3 u v
++ x^2 y^2 z w^3 v^2
++ x^2 y^2 z w^2 u^3
++ 8 x^2 y^2 z w^2 u^2 v
++ 8 x^2 y^2 z w^2 u v^2
++ x^2 y^2 z w^2 v^3
++ 2 x^2 y^2 z w u^3 v
++ 8 x^2 y^2 z w u^2 v^2
++ 2 x^2 y^2 z w u v^3
++ x^2 y^2 z u^3 v^2
++ x^2 y^2 z u^2 v^3
++ x^2 y^2 w^3 u^2 v
++ x^2 y^2 w^3 u v^2
++ x^2 y^2 w^2 u^3 v
++ 4 x^2 y^2 w^2 u^2 v^2
++ x^2 y^2 w^2 u v^3
++ x^2 y^2 w u^3 v^2
++ x^2 y^2 w u^2 v^3
++ x^2 y z^3 w^2 u^2
++ 2 x^2 y z^3 w^2 u v
++ x^2 y z^3 w^2 v^2
++ 2 x^2 y z^3 w u^2 v
++ 2 x^2 y z^3 w u v^2
++ x^2 y z^3 u^2 v^2
++ x^2 y z^2 w^3 u^2
++ 2 x^2 y z^2 w^3 u v
++ x^2 y z^2 w^3 v^2
++ x^2 y z^2 w^2 u^3
++ 8 x^2 y z^2 w^2 u^2 v
++ 8 x^2 y z^2 w^2 u v^2
++ x^2 y z^2 w^2 v^3
++ 2 x^2 y z^2 w u^3 v
++ 8 x^2 y z^2 w u^2 v^2
++ 2 x^2 y z^2 w u v^3
++ x^2 y z^2 u^3 v^2
++ x^2 y z^2 u^2 v^3
++ 2 x^2 y z w^3 u^2 v
++ 2 x^2 y z w^3 u v^2
++ 2 x^2 y z w^2 u^3 v
++ 8 x^2 y z w^2 u^2 v^2
++ 2 x^2 y z w^2 u v^3
++ 2 x^2 y z w u^3 v^2
++ 2 x^2 y z w u^2 v^3
++ x^2 y w^3 u^2 v^2
++ x^2 y w^2 u^3 v^2
++ x^2 y w^2 u^2 v^3
++ x^2 z^3 w^2 u^2 v
++ x^2 z^3 w^2 u v^2
++ x^2 z^3 w u^2 v^2
++ x^2 z^2 w^3 u^2 v
++ x^2 z^2 w^3 u v^2
++ x^2 z^2 w^2 u^3 v
++ 4 x^2 z^2 w^2 u^2 v^2
++ x^2 z^2 w^2 u v^3
++ x^2 z^2 w u^3 v^2
++ x^2 z^2 w u^2 v^3
++ x^2 z w^3 u^2 v^2
++ x^2 z w^2 u^3 v^2
++ x^2 z w^2 u^2 v^3
++ x y^3 z^2 w^2 u^2
++ 2 x y^3 z^2 w^2 u v
++ x y^3 z^2 w^2 v^2
++ 2 x y^3 z^2 w u^2 v
++ 2 x y^3 z^2 w u v^2
++ x y^3 z^2 u^2 v^2
++ 2 x y^3 z w^2 u^2 v
++ 2 x y^3 z w^2 u v^2
++ 2 x y^3 z w u^2 v^2
++ x y^3 w^2 u^2 v^2
++ x y^2 z^3 w^2 u^2
++ 2 x y^2 z^3 w^2 u v
++ x y^2 z^3 w^2 v^2
++ 2 x y^2 z^3 w u^2 v
++ 2 x y^2 z^3 w u v^2
++ x y^2 z^3 u^2 v^2
++ x y^2 z^2 w^3 u^2
++ 2 x y^2 z^2 w^3 u v
++ x y^2 z^2 w^3 v^2
++ x y^2 z^2 w^2 u^3
++ 8 x y^2 z^2 w^2 u^2 v
++ 8 x y^2 z^2 w^2 u v^2
++ x y^2 z^2 w^2 v^3
++ 2 x y^2 z^2 w u^3 v
++ 8 x y^2 z^2 w u^2 v^2
++ 2 x y^2 z^2 w u v^3
++ x y^2 z^2 u^3 v^2
++ x y^2 z^2 u^2 v^3
++ 2 x y^2 z w^3 u^2 v
++ 2 x y^2 z w^3 u v^2
++ 2 x y^2 z w^2 u^3 v
++ 8 x y^2 z w^2 u^2 v^2
++ 2 x y^2 z w^2 u v^3
++ 2 x y^2 z w u^3 v^2
++ 2 x y^2 z w u^2 v^3
++ x y^2 w^3 u^2 v^2
++ x y^2 w^2 u^3 v^2
++ x y^2 w^2 u^2 v^3
++ 2 x y z^3 w^2 u^2 v
++ 2 x y z^3 w^2 u v^2
++ 2 x y z^3 w u^2 v^2
++ 2 x y z^2 w^3 u^2 v
++ 2 x y z^2 w^3 u v^2
++ 2 x y z^2 w^2 u^3 v
++ 8 x y z^2 w^2 u^2 v^2
++ 2 x y z^2 w^2 u v^3
++ 2 x y z^2 w u^3 v^2
++ 2 x y z^2 w u^2 v^3
++ 2 x y z w^3 u^2 v^2
++ 2 x y z w^2 u^3 v^2
++ 2 x y z w^2 u^2 v^3
++ x z^3 w^2 u^2 v^2
++ x z^2 w^3 u^2 v^2
++ x z^2 w^2 u^3 v^2
++ x z^2 w^2 u^2 v^3
++ y^3 z^2 w^2 u^2 v
++ y^3 z^2 w^2 u v^2
++ y^3 z^2 w u^2 v^2
++ y^3 z w^2 u^2 v^2
++ y^2 z^3 w^2 u^2 v
++ y^2 z^3 w^2 u v^2
++ y^2 z^3 w u^2 v^2
++ y^2 z^2 w^3 u^2 v
++ y^2 z^2 w^3 u v^2
++ y^2 z^2 w^2 u^3 v
++ 4 y^2 z^2 w^2 u^2 v^2
++ y^2 z^2 w^2 u v^3
++ y^2 z^2 w u^3 v^2
++ y^2 z^2 w u^2 v^3
++ y^2 z w^3 u^2 v^2
++ y^2 z w^2 u^3 v^2
++ y^2 z w^2 u^2 v^3
++ y z^3 w^2 u^2 v^2
++ y z^2 w^3 u^2 v^2
++ y z^2 w^2 u^3 v^2
++ y z^2 w^2 u^2 v^3
+- x^4 y^2 z^2 w^2 u v
+- x^4 y^2 z^2 w u^2 v
+- x^4 y^2 z^2 w u v^2
+- x^4 y^2 z w^2 u^2 v
+- x^4 y^2 z w^2 u v^2
+- x^4 y^2 z w u^2 v^2
+- x^4 y z^2 w^2 u^2 v
+- x^4 y z^2 w^2 u v^2
+- x^4 y z^2 w u^2 v^2
+- x^4 y z w^2 u^2 v^2
+- x^3 y^3 z^2 w^2 u^2
+- 2 x^3 y^3 z^2 w^2 u v
+- x^3 y^3 z^2 w^2 v^2
+- 2 x^3 y^3 z^2 w u^2 v
+- 2 x^3 y^3 z^2 w u v^2
+- x^3 y^3 z^2 u^2 v^2
+- 2 x^3 y^3 z w^2 u^2 v
+- 2 x^3 y^3 z w^2 u v^2
+- 2 x^3 y^3 z w u^2 v^2
+- x^3 y^3 w^2 u^2 v^2
+- x^3 y^2 z^3 w^2 u^2
+- 2 x^3 y^2 z^3 w^2 u v
+- x^3 y^2 z^3 w^2 v^2
+- 2 x^3 y^2 z^3 w u^2 v
+- 2 x^3 y^2 z^3 w u v^2
+- x^3 y^2 z^3 u^2 v^2
+- x^3 y^2 z^2 w^3 u^2
+- 2 x^3 y^2 z^2 w^3 u v
+- x^3 y^2 z^2 w^3 v^2
+- x^3 y^2 z^2 w^2 u^3
+- 8 x^3 y^2 z^2 w^2 u^2 v
+- 8 x^3 y^2 z^2 w^2 u v^2
+- x^3 y^2 z^2 w^2 v^3
+- 2 x^3 y^2 z^2 w u^3 v
+- 8 x^3 y^2 z^2 w u^2 v^2
+- 2 x^3 y^2 z^2 w u v^3
+- x^3 y^2 z^2 u^3 v^2
+- x^3 y^2 z^2 u^2 v^3
+- 2 x^3 y^2 z w^3 u^2 v
+- 2 x^3 y^2 z w^3 u v^2
+- 2 x^3 y^2 z w^2 u^3 v
+- 8 x^3 y^2 z w^2 u^2 v^2
+- 2 x^3 y^2 z w^2 u v^3
+- 2 x^3 y^2 z w u^3 v^2
+- 2 x^3 y^2 z w u^2 v^3
+- x^3 y^2 w^3 u^2 v^2
+- x^3 y^2 w^2 u^3 v^2
+- x^3 y^2 w^2 u^2 v^3
+- 2 x^3 y z^3 w^2 u^2 v
+- 2 x^3 y z^3 w^2 u v^2
+- 2 x^3 y z^3 w u^2 v^2
+- 2 x^3 y z^2 w^3 u^2 v
+- 2 x^3 y z^2 w^3 u v^2
+- 2 x^3 y z^2 w^2 u^3 v
+- 8 x^3 y z^2 w^2 u^2 v^2
+- 2 x^3 y z^2 w^2 u v^3
+- 2 x^3 y z^2 w u^3 v^2
+- 2 x^3 y z^2 w u^2 v^3
+- 2 x^3 y z w^3 u^2 v^2
+- 2 x^3 y z w^2 u^3 v^2
+- 2 x^3 y z w^2 u^2 v^3
+- x^3 z^3 w^2 u^2 v^2
+- x^3 z^2 w^3 u^2 v^2
+- x^3 z^2 w^2 u^3 v^2
+- x^3 z^2 w^2 u^2 v^3
+- x^2 y^4 z^2 w^2 u v
+- x^2 y^4 z^2 w u^2 v
+- x^2 y^4 z^2 w u v^2
+- x^2 y^4 z w^2 u^2 v
+- x^2 y^4 z w^2 u v^2
+- x^2 y^4 z w u^2 v^2
+- x^2 y^3 z^3 w^2 u^2
+- 2 x^2 y^3 z^3 w^2 u v
+- x^2 y^3 z^3 w^2 v^2
+- 2 x^2 y^3 z^3 w u^2 v
+- 2 x^2 y^3 z^3 w u v^2
+- x^2 y^3 z^3 u^2 v^2
+- x^2 y^3 z^2 w^3 u^2
+- 2 x^2 y^3 z^2 w^3 u v
+- x^2 y^3 z^2 w^3 v^2
+- x^2 y^3 z^2 w^2 u^3
+- 8 x^2 y^3 z^2 w^2 u^2 v
+- 8 x^2 y^3 z^2 w^2 u v^2
+- x^2 y^3 z^2 w^2 v^3
+- 2 x^2 y^3 z^2 w u^3 v
+- 8 x^2 y^3 z^2 w u^2 v^2
+- 2 x^2 y^3 z^2 w u v^3
+- x^2 y^3 z^2 u^3 v^2
+- x^2 y^3 z^2 u^2 v^3
+- 2 x^2 y^3 z w^3 u^2 v
+- 2 x^2 y^3 z w^3 u v^2
+- 2 x^2 y^3 z w^2 u^3 v
+- 8 x^2 y^3 z w^2 u^2 v^2
+- 2 x^2 y^3 z w^2 u v^3
+- 2 x^2 y^3 z w u^3 v^2
+- 2 x^2 y^3 z w u^2 v^3
+- x^2 y^3 w^3 u^2 v^2
+- x^2 y^3 w^2 u^3 v^2
+- x^2 y^3 w^2 u^2 v^3
+- x^2 y^2 z^4 w^2 u v
+- x^2 y^2 z^4 w u^2 v
+- x^2 y^2 z^4 w u v^2
+- x^2 y^2 z^3 w^3 u^2
+- 2 x^2 y^2 z^3 w^3 u v
+- x^2 y^2 z^3 w^3 v^2
+- x^2 y^2 z^3 w^2 u^3
+- 8 x^2 y^2 z^3 w^2 u^2 v
+- 8 x^2 y^2 z^3 w^2 u v^2
+- x^2 y^2 z^3 w^2 v^3
+- 2 x^2 y^2 z^3 w u^3 v
+- 8 x^2 y^2 z^3 w u^2 v^2
+- 2 x^2 y^2 z^3 w u v^3
+- x^2 y^2 z^3 u^3 v^2
+- x^2 y^2 z^3 u^2 v^3
+- x^2 y^2 z^2 w^4 u v
+- x^2 y^2 z^2 w^3 u^3
+- 8 x^2 y^2 z^2 w^3 u^2 v
+- 8 x^2 y^2 z^2 w^3 u v^2
+- x^2 y^2 z^2 w^3 v^3
+- 8 x^2 y^2 z^2 w^2 u^3 v
+- 20 x^2 y^2 z^2 w^2 u^2 v^2
+- 8 x^2 y^2 z^2 w^2 u v^3
+- x^2 y^2 z^2 w u^4 v
+- 8 x^2 y^2 z^2 w u^3 v^2
+- 8 x^2 y^2 z^2 w u^2 v^3
+- x^2 y^2 z^2 w u v^4
+- x^2 y^2 z^2 u^3 v^3
+- x^2 y^2 z w^4 u^2 v
+- x^2 y^2 z w^4 u v^2
+- 2 x^2 y^2 z w^3 u^3 v
+- 8 x^2 y^2 z w^3 u^2 v^2
+- 2 x^2 y^2 z w^3 u v^3
+- x^2 y^2 z w^2 u^4 v
+- 8 x^2 y^2 z w^2 u^3 v^2
+- 8 x^2 y^2 z w^2 u^2 v^3
+- x^2 y^2 z w^2 u v^4
+- x^2 y^2 z w u^4 v^2
+- 2 x^2 y^2 z w u^3 v^3
+- x^2 y^2 z w u^2 v^4
+- x^2 y^2 w^3 u^3 v^2
+- x^2 y^2 w^3 u^2 v^3
+- x^2 y^2 w^2 u^3 v^3
+- x^2 y z^4 w^2 u^2 v
+- x^2 y z^4 w^2 u v^2
+- x^2 y z^4 w u^2 v^2
+- 2 x^2 y z^3 w^3 u^2 v
+- 2 x^2 y z^3 w^3 u v^2
+- 2 x^2 y z^3 w^2 u^3 v
+- 8 x^2 y z^3 w^2 u^2 v^2
+- 2 x^2 y z^3 w^2 u v^3
+- 2 x^2 y z^3 w u^3 v^2
+- 2 x^2 y z^3 w u^2 v^3
+- x^2 y z^2 w^4 u^2 v
+- x^2 y z^2 w^4 u v^2
+- 2 x^2 y z^2 w^3 u^3 v
+- 8 x^2 y z^2 w^3 u^2 v^2
+- 2 x^2 y z^2 w^3 u v^3
+- x^2 y z^2 w^2 u^4 v
+- 8 x^2 y z^2 w^2 u^3 v^2
+- 8 x^2 y z^2 w^2 u^2 v^3
+- x^2 y z^2 w^2 u v^4
+- x^2 y z^2 w u^4 v^2
+- 2 x^2 y z^2 w u^3 v^3
+- x^2 y z^2 w u^2 v^4
+- x^2 y z w^4 u^2 v^2
+- 2 x^2 y z w^3 u^3 v^2
+- 2 x^2 y z w^3 u^2 v^3
+- x^2 y z w^2 u^4 v^2
+- 2 x^2 y z w^2 u^3 v^3
+- x^2 y z w^2 u^2 v^4
+- x^2 z^3 w^3 u^2 v^2
+- x^2 z^3 w^2 u^3 v^2
+- x^2 z^3 w^2 u^2 v^3
+- x^2 z^2 w^3 u^3 v^2
+- x^2 z^2 w^3 u^2 v^3
+- x^2 z^2 w^2 u^3 v^3
+- x y^4 z^2 w^2 u^2 v
+- x y^4 z^2 w^2 u v^2
+- x y^4 z^2 w u^2 v^2
+- x y^4 z w^2 u^2 v^2
+- 2 x y^3 z^3 w^2 u^2 v
+- 2 x y^3 z^3 w^2 u v^2
+- 2 x y^3 z^3 w u^2 v^2
+- 2 x y^3 z^2 w^3 u^2 v
+- 2 x y^3 z^2 w^3 u v^2
+- 2 x y^3 z^2 w^2 u^3 v
+- 8 x y^3 z^2 w^2 u^2 v^2
+- 2 x y^3 z^2 w^2 u v^3
+- 2 x y^3 z^2 w u^3 v^2
+- 2 x y^3 z^2 w u^2 v^3
+- 2 x y^3 z w^3 u^2 v^2
+- 2 x y^3 z w^2 u^3 v^2
+- 2 x y^3 z w^2 u^2 v^3
+- x y^2 z^4 w^2 u^2 v
+- x y^2 z^4 w^2 u v^2
+- x y^2 z^4 w u^2 v^2
+- 2 x y^2 z^3 w^3 u^2 v
+- 2 x y^2 z^3 w^3 u v^2
+- 2 x y^2 z^3 w^2 u^3 v
+- 8 x y^2 z^3 w^2 u^2 v^2
+- 2 x y^2 z^3 w^2 u v^3
+- 2 x y^2 z^3 w u^3 v^2
+- 2 x y^2 z^3 w u^2 v^3
+- x y^2 z^2 w^4 u^2 v
+- x y^2 z^2 w^4 u v^2
+- 2 x y^2 z^2 w^3 u^3 v
+- 8 x y^2 z^2 w^3 u^2 v^2
+- 2 x y^2 z^2 w^3 u v^3
+- x y^2 z^2 w^2 u^4 v
+- 8 x y^2 z^2 w^2 u^3 v^2
+- 8 x y^2 z^2 w^2 u^2 v^3
+- x y^2 z^2 w^2 u v^4
+- x y^2 z^2 w u^4 v^2
+- 2 x y^2 z^2 w u^3 v^3
+- x y^2 z^2 w u^2 v^4
+- x y^2 z w^4 u^2 v^2
+- 2 x y^2 z w^3 u^3 v^2
+- 2 x y^2 z w^3 u^2 v^3
+- x y^2 z w^2 u^4 v^2
+- 2 x y^2 z w^2 u^3 v^3
+- x y^2 z w^2 u^2 v^4
+- x y z^4 w^2 u^2 v^2
+- 2 x y z^3 w^3 u^2 v^2
+- 2 x y z^3 w^2 u^3 v^2
+- 2 x y z^3 w^2 u^2 v^3
+- x y z^2 w^4 u^2 v^2
+- 2 x y z^2 w^3 u^3 v^2
+- 2 x y z^2 w^3 u^2 v^3
+- x y z^2 w^2 u^4 v^2
+- 2 x y z^2 w^2 u^3 v^3
+- x y z^2 w^2 u^2 v^4
+- y^3 z^3 w^2 u^2 v^2
+- y^3 z^2 w^3 u^2 v^2
+- y^3 z^2 w^2 u^3 v^2
+- y^3 z^2 w^2 u^2 v^3
+- y^2 z^3 w^3 u^2 v^2
+- y^2 z^3 w^2 u^3 v^2
+- y^2 z^3 w^2 u^2 v^3
+- y^2 z^2 w^3 u^3 v^2
+- y^2 z^2 w^3 u^2 v^3
+- y^2 z^2 w^2 u^3 v^3
++ x^4 y^3 z^2 w^2 u^2 v
++ x^4 y^3 z^2 w^2 u v^2
++ x^4 y^3 z^2 w u^2 v^2
++ x^4 y^3 z w^2 u^2 v^2
++ x^4 y^2 z^3 w^2 u^2 v
++ x^4 y^2 z^3 w^2 u v^2
++ x^4 y^2 z^3 w u^2 v^2
++ x^4 y^2 z^2 w^3 u^2 v
++ x^4 y^2 z^2 w^3 u v^2
++ x^4 y^2 z^2 w^2 u^3 v
++ 4 x^4 y^2 z^2 w^2 u^2 v^2
++ x^4 y^2 z^2 w^2 u v^3
++ x^4 y^2 z^2 w u^3 v^2
++ x^4 y^2 z^2 w u^2 v^3
++ x^4 y^2 z w^3 u^2 v^2
++ x^4 y^2 z w^2 u^3 v^2
++ x^4 y^2 z w^2 u^2 v^3
++ x^4 y z^3 w^2 u^2 v^2
++ x^4 y z^2 w^3 u^2 v^2
++ x^4 y z^2 w^2 u^3 v^2
++ x^4 y z^2 w^2 u^2 v^3
++ x^3 y^4 z^2 w^2 u^2 v
++ x^3 y^4 z^2 w^2 u v^2
++ x^3 y^4 z^2 w u^2 v^2
++ x^3 y^4 z w^2 u^2 v^2
++ 2 x^3 y^3 z^3 w^2 u^2 v
++ 2 x^3 y^3 z^3 w^2 u v^2
++ 2 x^3 y^3 z^3 w u^2 v^2
++ 2 x^3 y^3 z^2 w^3 u^2 v
++ 2 x^3 y^3 z^2 w^3 u v^2
++ 2 x^3 y^3 z^2 w^2 u^3 v
++ 8 x^3 y^3 z^2 w^2 u^2 v^2
++ 2 x^3 y^3 z^2 w^2 u v^3
++ 2 x^3 y^3 z^2 w u^3 v^2
++ 2 x^3 y^3 z^2 w u^2 v^3
++ 2 x^3 y^3 z w^3 u^2 v^2
++ 2 x^3 y^3 z w^2 u^3 v^2
++ 2 x^3 y^3 z w^2 u^2 v^3
++ x^3 y^2 z^4 w^2 u^2 v
++ x^3 y^2 z^4 w^2 u v^2
++ x^3 y^2 z^4 w u^2 v^2
++ 2 x^3 y^2 z^3 w^3 u^2 v
++ 2 x^3 y^2 z^3 w^3 u v^2
++ 2 x^3 y^2 z^3 w^2 u^3 v
++ 8 x^3 y^2 z^3 w^2 u^2 v^2
++ 2 x^3 y^2 z^3 w^2 u v^3
++ 2 x^3 y^2 z^3 w u^3 v^2
++ 2 x^3 y^2 z^3 w u^2 v^3
++ x^3 y^2 z^2 w^4 u^2 v
++ x^3 y^2 z^2 w^4 u v^2
++ 2 x^3 y^2 z^2 w^3 u^3 v
++ 8 x^3 y^2 z^2 w^3 u^2 v^2
++ 2 x^3 y^2 z^2 w^3 u v^3
++ x^3 y^2 z^2 w^2 u^4 v
++ 8 x^3 y^2 z^2 w^2 u^3 v^2
++ 8 x^3 y^2 z^2 w^2 u^2 v^3
++ x^3 y^2 z^2 w^2 u v^4
++ x^3 y^2 z^2 w u^4 v^2
++ 2 x^3 y^2 z^2 w u^3 v^3
++ x^3 y^2 z^2 w u^2 v^4
++ x^3 y^2 z w^4 u^2 v^2
++ 2 x^3 y^2 z w^3 u^3 v^2
++ 2 x^3 y^2 z w^3 u^2 v^3
++ x^3 y^2 z w^2 u^4 v^2
++ 2 x^3 y^2 z w^2 u^3 v^3
++ x^3 y^2 z w^2 u^2 v^4
++ x^3 y z^4 w^2 u^2 v^2
++ 2 x^3 y z^3 w^3 u^2 v^2
++ 2 x^3 y z^3 w^2 u^3 v^2
++ 2 x^3 y z^3 w^2 u^2 v^3
++ x^3 y z^2 w^4 u^2 v^2
++ 2 x^3 y z^2 w^3 u^3 v^2
++ 2 x^3 y z^2 w^3 u^2 v^3
++ x^3 y z^2 w^2 u^4 v^2
++ 2 x^3 y z^2 w^2 u^3 v^3
++ x^3 y z^2 w^2 u^2 v^4
++ x^2 y^4 z^3 w^2 u^2 v
++ x^2 y^4 z^3 w^2 u v^2
++ x^2 y^4 z^3 w u^2 v^2
++ x^2 y^4 z^2 w^3 u^2 v
++ x^2 y^4 z^2 w^3 u v^2
++ x^2 y^4 z^2 w^2 u^3 v
++ 4 x^2 y^4 z^2 w^2 u^2 v^2
++ x^2 y^4 z^2 w^2 u v^3
++ x^2 y^4 z^2 w u^3 v^2
++ x^2 y^4 z^2 w u^2 v^3
++ x^2 y^4 z w^3 u^2 v^2
++ x^2 y^4 z w^2 u^3 v^2
++ x^2 y^4 z w^2 u^2 v^3
++ x^2 y^3 z^4 w^2 u^2 v
++ x^2 y^3 z^4 w^2 u v^2
++ x^2 y^3 z^4 w u^2 v^2
++ 2 x^2 y^3 z^3 w^3 u^2 v
++ 2 x^2 y^3 z^3 w^3 u v^2
++ 2 x^2 y^3 z^3 w^2 u^3 v
++ 8 x^2 y^3 z^3 w^2 u^2 v^2
++ 2 x^2 y^3 z^3 w^2 u v^3
++ 2 x^2 y^3 z^3 w u^3 v^2
++ 2 x^2 y^3 z^3 w u^2 v^3
++ x^2 y^3 z^2 w^4 u^2 v
++ x^2 y^3 z^2 w^4 u v^2
++ 2 x^2 y^3 z^2 w^3 u^3 v
++ 8 x^2 y^3 z^2 w^3 u^2 v^2
++ 2 x^2 y^3 z^2 w^3 u v^3
++ x^2 y^3 z^2 w^2 u^4 v
++ 8 x^2 y^3 z^2 w^2 u^3 v^2
++ 8 x^2 y^3 z^2 w^2 u^2 v^3
++ x^2 y^3 z^2 w^2 u v^4
++ x^2 y^3 z^2 w u^4 v^2
++ 2 x^2 y^3 z^2 w u^3 v^3
++ x^2 y^3 z^2 w u^2 v^4
++ x^2 y^3 z w^4 u^2 v^2
++ 2 x^2 y^3 z w^3 u^3 v^2
++ 2 x^2 y^3 z w^3 u^2 v^3
++ x^2 y^3 z w^2 u^4 v^2
++ 2 x^2 y^3 z w^2 u^3 v^3
++ x^2 y^3 z w^2 u^2 v^4
++ x^2 y^2 z^4 w^3 u^2 v
++ x^2 y^2 z^4 w^3 u v^2
++ x^2 y^2 z^4 w^2 u^3 v
++ 4 x^2 y^2 z^4 w^2 u^2 v^2
++ x^2 y^2 z^4 w^2 u v^3
++ x^2 y^2 z^4 w u^3 v^2
++ x^2 y^2 z^4 w u^2 v^3
++ x^2 y^2 z^3 w^4 u^2 v
++ x^2 y^2 z^3 w^4 u v^2
++ 2 x^2 y^2 z^3 w^3 u^3 v
++ 8 x^2 y^2 z^3 w^3 u^2 v^2
++ 2 x^2 y^2 z^3 w^3 u v^3
++ x^2 y^2 z^3 w^2 u^4 v
++ 8 x^2 y^2 z^3 w^2 u^3 v^2
++ 8 x^2 y^2 z^3 w^2 u^2 v^3
++ x^2 y^2 z^3 w^2 u v^4
++ x^2 y^2 z^3 w u^4 v^2
++ 2 x^2 y^2 z^3 w u^3 v^3
++ x^2 y^2 z^3 w u^2 v^4
++ x^2 y^2 z^2 w^4 u^3 v
++ 4 x^2 y^2 z^2 w^4 u^2 v^2
++ x^2 y^2 z^2 w^4 u v^3
++ x^2 y^2 z^2 w^3 u^4 v
++ 8 x^2 y^2 z^2 w^3 u^3 v^2
++ 8 x^2 y^2 z^2 w^3 u^2 v^3
++ x^2 y^2 z^2 w^3 u v^4
++ 4 x^2 y^2 z^2 w^2 u^4 v^2
++ 8 x^2 y^2 z^2 w^2 u^3 v^3
++ 4 x^2 y^2 z^2 w^2 u^2 v^4
++ x^2 y^2 z^2 w u^4 v^3
++ x^2 y^2 z^2 w u^3 v^4
++ x^2 y^2 z w^4 u^3 v^2
++ x^2 y^2 z w^4 u^2 v^3
++ x^2 y^2 z w^3 u^4 v^2
++ 2 x^2 y^2 z w^3 u^3 v^3
++ x^2 y^2 z w^3 u^2 v^4
++ x^2 y^2 z w^2 u^4 v^3
++ x^2 y^2 z w^2 u^3 v^4
++ x^2 y z^4 w^3 u^2 v^2
++ x^2 y z^4 w^2 u^3 v^2
++ x^2 y z^4 w^2 u^2 v^3
++ x^2 y z^3 w^4 u^2 v^2
++ 2 x^2 y z^3 w^3 u^3 v^2
++ 2 x^2 y z^3 w^3 u^2 v^3
++ x^2 y z^3 w^2 u^4 v^2
++ 2 x^2 y z^3 w^2 u^3 v^3
++ x^2 y z^3 w^2 u^2 v^4
++ x^2 y z^2 w^4 u^3 v^2
++ x^2 y z^2 w^4 u^2 v^3
++ x^2 y z^2 w^3 u^4 v^2
++ 2 x^2 y z^2 w^3 u^3 v^3
++ x^2 y z^2 w^3 u^2 v^4
++ x^2 y z^2 w^2 u^4 v^3
++ x^2 y z^2 w^2 u^3 v^4
++ x y^4 z^3 w^2 u^2 v^2
++ x y^4 z^2 w^3 u^2 v^2
++ x y^4 z^2 w^2 u^3 v^2
++ x y^4 z^2 w^2 u^2 v^3
++ x y^3 z^4 w^2 u^2 v^2
++ 2 x y^3 z^3 w^3 u^2 v^2
++ 2 x y^3 z^3 w^2 u^3 v^2
++ 2 x y^3 z^3 w^2 u^2 v^3
++ x y^3 z^2 w^4 u^2 v^2
++ 2 x y^3 z^2 w^3 u^3 v^2
++ 2 x y^3 z^2 w^3 u^2 v^3
++ x y^3 z^2 w^2 u^4 v^2
++ 2 x y^3 z^2 w^2 u^3 v^3
++ x y^3 z^2 w^2 u^2 v^4
++ x y^2 z^4 w^3 u^2 v^2
++ x y^2 z^4 w^2 u^3 v^2
++ x y^2 z^4 w^2 u^2 v^3
++ x y^2 z^3 w^4 u^2 v^2
++ 2 x y^2 z^3 w^3 u^3 v^2
++ 2 x y^2 z^3 w^3 u^2 v^3
++ x y^2 z^3 w^2 u^4 v^2
++ 2 x y^2 z^3 w^2 u^3 v^3
++ x y^2 z^3 w^2 u^2 v^4
++ x y^2 z^2 w^4 u^3 v^2
++ x y^2 z^2 w^4 u^2 v^3
++ x y^2 z^2 w^3 u^4 v^2
++ 2 x y^2 z^2 w^3 u^3 v^3
++ x y^2 z^2 w^3 u^2 v^4
++ x y^2 z^2 w^2 u^4 v^3
++ x y^2 z^2 w^2 u^3 v^4
+- x^3 y^3 z^3 w^3 u^3
+- x^3 y^3 z^3 w^3 u^2 v
+- x^3 y^3 z^3 w^3 u v^2
+- x^3 y^3 z^3 w^3 v^3
+- x^3 y^3 z^3 w^2 u^3 v
+- x^3 y^3 z^3 w^2 u^2 v^2
+- x^3 y^3 z^3 w^2 u v^3
+- x^3 y^3 z^3 w u^3 v^2
+- x^3 y^3 z^3 w u^2 v^3
+- x^3 y^3 z^3 u^3 v^3
+- x^3 y^3 z^2 w^3 u^3 v
+- x^3 y^3 z^2 w^3 u^2 v^2
+- x^3 y^3 z^2 w^3 u v^3
+- x^3 y^3 z^2 w^2 u^3 v^2
+- x^3 y^3 z^2 w^2 u^2 v^3
+- x^3 y^3 z^2 w u^3 v^3
+- x^3 y^3 z w^3 u^3 v^2
+- x^3 y^3 z w^3 u^2 v^3
+- x^3 y^3 z w^2 u^3 v^3
+- x^3 y^3 w^3 u^3 v^3
+- x^3 y^2 z^3 w^3 u^3 v
+- x^3 y^2 z^3 w^3 u^2 v^2
+- x^3 y^2 z^3 w^3 u v^3
+- x^3 y^2 z^3 w^2 u^3 v^2
+- x^3 y^2 z^3 w^2 u^2 v^3
+- x^3 y^2 z^3 w u^3 v^3
+- x^3 y^2 z^2 w^3 u^3 v^2
+- x^3 y^2 z^2 w^3 u^2 v^3
+- x^3 y^2 z^2 w^2 u^3 v^3
+- x^3 y^2 z w^3 u^3 v^3
+- x^3 y z^3 w^3 u^3 v^2
+- x^3 y z^3 w^3 u^2 v^3
+- x^3 y z^3 w^2 u^3 v^3
+- x^3 y z^2 w^3 u^3 v^3
+- x^3 z^3 w^3 u^3 v^3
+- x^2 y^3 z^3 w^3 u^3 v
+- x^2 y^3 z^3 w^3 u^2 v^2
+- x^2 y^3 z^3 w^3 u v^3
+- x^2 y^3 z^3 w^2 u^3 v^2
+- x^2 y^3 z^3 w^2 u^2 v^3
+- x^2 y^3 z^3 w u^3 v^3
+- x^2 y^3 z^2 w^3 u^3 v^2
+- x^2 y^3 z^2 w^3 u^2 v^3
+- x^2 y^3 z^2 w^2 u^3 v^3
+- x^2 y^3 z w^3 u^3 v^3
+- x^2 y^2 z^3 w^3 u^3 v^2
+- x^2 y^2 z^3 w^3 u^2 v^3
+- x^2 y^2 z^3 w^2 u^3 v^3
+- x^2 y^2 z^2 w^3 u^3 v^3
+- x^2 y z^3 w^3 u^3 v^3
+- x y^3 z^3 w^3 u^3 v^2
+- x y^3 z^3 w^3 u^2 v^3
+- x y^3 z^3 w^2 u^3 v^3
+- x y^3 z^2 w^3 u^3 v^3
+- x y^2 z^3 w^3 u^3 v^3
+- y^3 z^3 w^3 u^3 v^3
+- x^4 y^4 z^2 w^2 u^2 v^2
+- x^4 y^3 z^3 w^2 u^2 v^2
+- x^4 y^3 z^2 w^3 u^2 v^2
+- x^4 y^3 z^2 w^2 u^3 v^2
+- x^4 y^3 z^2 w^2 u^2 v^3
+- x^4 y^2 z^4 w^2 u^2 v^2
+- x^4 y^2 z^3 w^3 u^2 v^2
+- x^4 y^2 z^3 w^2 u^3 v^2
+- x^4 y^2 z^3 w^2 u^2 v^3
+- x^4 y^2 z^2 w^4 u^2 v^2
+- x^4 y^2 z^2 w^3 u^3 v^2
+- x^4 y^2 z^2 w^3 u^2 v^3
+- x^4 y^2 z^2 w^2 u^4 v^2
+- x^4 y^2 z^2 w^2 u^3 v^3
+- x^4 y^2 z^2 w^2 u^2 v^4
+- x^3 y^4 z^3 w^2 u^2 v^2
+- x^3 y^4 z^2 w^3 u^2 v^2
+- x^3 y^4 z^2 w^2 u^3 v^2
+- x^3 y^4 z^2 w^2 u^2 v^3
+- x^3 y^3 z^4 w^2 u^2 v^2
+- 2 x^3 y^3 z^3 w^3 u^2 v^2
+- 2 x^3 y^3 z^3 w^2 u^3 v^2
+- 2 x^3 y^3 z^3 w^2 u^2 v^3
+- x^3 y^3 z^2 w^4 u^2 v^2
+- 2 x^3 y^3 z^2 w^3 u^3 v^2
+- 2 x^3 y^3 z^2 w^3 u^2 v^3
+- x^3 y^3 z^2 w^2 u^4 v^2
+- 2 x^3 y^3 z^2 w^2 u^3 v^3
+- x^3 y^3 z^2 w^2 u^2 v^4
+- x^3 y^2 z^4 w^3 u^2 v^2
+- x^3 y^2 z^4 w^2 u^3 v^2
+- x^3 y^2 z^4 w^2 u^2 v^3
+- x^3 y^2 z^3 w^4 u^2 v^2
+- 2 x^3 y^2 z^3 w^3 u^3 v^2
+- 2 x^3 y^2 z^3 w^3 u^2 v^3
+- x^3 y^2 z^3 w^2 u^4 v^2
+- 2 x^3 y^2 z^3 w^2 u^3 v^3
+- x^3 y^2 z^3 w^2 u^2 v^4
+- x^3 y^2 z^2 w^4 u^3 v^2
+- x^3 y^2 z^2 w^4 u^2 v^3
+- x^3 y^2 z^2 w^3 u^4 v^2
+- 2 x^3 y^2 z^2 w^3 u^3 v^3
+- x^3 y^2 z^2 w^3 u^2 v^4
+- x^3 y^2 z^2 w^2 u^4 v^3
+- x^3 y^2 z^2 w^2 u^3 v^4
+- x^2 y^4 z^4 w^2 u^2 v^2
+- x^2 y^4 z^3 w^3 u^2 v^2
+- x^2 y^4 z^3 w^2 u^3 v^2
+- x^2 y^4 z^3 w^2 u^2 v^3
+- x^2 y^4 z^2 w^4 u^2 v^2
+- x^2 y^4 z^2 w^3 u^3 v^2
+- x^2 y^4 z^2 w^3 u^2 v^3
+- x^2 y^4 z^2 w^2 u^4 v^2
+- x^2 y^4 z^2 w^2 u^3 v^3
+- x^2 y^4 z^2 w^2 u^2 v^4
+- x^2 y^3 z^4 w^3 u^2 v^2
+- x^2 y^3 z^4 w^2 u^3 v^2
+- x^2 y^3 z^4 w^2 u^2 v^3
+- x^2 y^3 z^3 w^4 u^2 v^2
+- 2 x^2 y^3 z^3 w^3 u^3 v^2
+- 2 x^2 y^3 z^3 w^3 u^2 v^3
+- x^2 y^3 z^3 w^2 u^4 v^2
+- 2 x^2 y^3 z^3 w^2 u^3 v^3
+- x^2 y^3 z^3 w^2 u^2 v^4
+- x^2 y^3 z^2 w^4 u^3 v^2
+- x^2 y^3 z^2 w^4 u^2 v^3
+- x^2 y^3 z^2 w^3 u^4 v^2
+- 2 x^2 y^3 z^2 w^3 u^3 v^3
+- x^2 y^3 z^2 w^3 u^2 v^4
+- x^2 y^3 z^2 w^2 u^4 v^3
+- x^2 y^3 z^2 w^2 u^3 v^4
+- x^2 y^2 z^4 w^4 u^2 v^2
+- x^2 y^2 z^4 w^3 u^3 v^2
+- x^2 y^2 z^4 w^3 u^2 v^3
+- x^2 y^2 z^4 w^2 u^4 v^2
+- x^2 y^2 z^4 w^2 u^3 v^3
+- x^2 y^2 z^4 w^2 u^2 v^4
+- x^2 y^2 z^3 w^4 u^3 v^2
+- x^2 y^2 z^3 w^4 u^2 v^3
+- x^2 y^2 z^3 w^3 u^4 v^2
+- 2 x^2 y^2 z^3 w^3 u^3 v^3
+- x^2 y^2 z^3 w^3 u^2 v^4
+- x^2 y^2 z^3 w^2 u^4 v^3
+- x^2 y^2 z^3 w^2 u^3 v^4
+- x^2 y^2 z^2 w^4 u^4 v^2
+- x^2 y^2 z^2 w^4 u^3 v^3
+- x^2 y^2 z^2 w^4 u^2 v^4
+- x^2 y^2 z^2 w^3 u^4 v^3
+- x^2 y^2 z^2 w^3 u^3 v^4
+- x^2 y^2 z^2 w^2 u^4 v^4
++ x^4 y^3 z^3 w^3 u^3 v
++ x^4 y^3 z^3 w^3 u^2 v^2
++ x^4 y^3 z^3 w^3 u v^3
++ x^4 y^3 z^3 w^2 u^3 v^2
++ x^4 y^3 z^3 w^2 u^2 v^3
++ x^4 y^3 z^3 w u^3 v^3
++ x^4 y^3 z^2 w^3 u^3 v^2
++ x^4 y^3 z^2 w^3 u^2 v^3
++ x^4 y^3 z^2 w^2 u^3 v^3
++ x^4 y^3 z w^3 u^3 v^3
++ x^4 y^2 z^3 w^3 u^3 v^2
++ x^4 y^2 z^3 w^3 u^2 v^3
++ x^4 y^2 z^3 w^2 u^3 v^3
++ x^4 y^2 z^2 w^3 u^3 v^3
++ x^4 y z^3 w^3 u^3 v^3
++ x^3 y^4 z^3 w^3 u^3 v
++ x^3 y^4 z^3 w^3 u^2 v^2
++ x^3 y^4 z^3 w^3 u v^3
++ x^3 y^4 z^3 w^2 u^3 v^2
++ x^3 y^4 z^3 w^2 u^2 v^3
++ x^3 y^4 z^3 w u^3 v^3
++ x^3 y^4 z^2 w^3 u^3 v^2
++ x^3 y^4 z^2 w^3 u^2 v^3
++ x^3 y^4 z^2 w^2 u^3 v^3
++ x^3 y^4 z w^3 u^3 v^3
++ x^3 y^3 z^4 w^3 u^3 v
++ x^3 y^3 z^4 w^3 u^2 v^2
++ x^3 y^3 z^4 w^3 u v^3
++ x^3 y^3 z^4 w^2 u^3 v^2
++ x^3 y^3 z^4 w^2 u^2 v^3
++ x^3 y^3 z^4 w u^3 v^3
++ x^3 y^3 z^3 w^4 u^3 v
++ x^3 y^3 z^3 w^4 u^2 v^2
++ x^3 y^3 z^3 w^4 u v^3
++ x^3 y^3 z^3 w^3 u^4 v
++ 5 x^3 y^3 z^3 w^3 u^3 v^2
++ 5 x^3 y^3 z^3 w^3 u^2 v^3
++ x^3 y^3 z^3 w^3 u v^4
++ x^3 y^3 z^3 w^2 u^4 v^2
++ 5 x^3 y^3 z^3 w^2 u^3 v^3
++ x^3 y^3 z^3 w^2 u^2 v^4
++ x^3 y^3 z^3 w u^4 v^3
++ x^3 y^3 z^3 w u^3 v^4
++ x^3 y^3 z^2 w^4 u^3 v^2
++ x^3 y^3 z^2 w^4 u^2 v^3
++ x^3 y^3 z^2 w^3 u^4 v^2
++ 5 x^3 y^3 z^2 w^3 u^3 v^3
++ x^3 y^3 z^2 w^3 u^2 v^4
++ x^3 y^3 z^2 w^2 u^4 v^3
++ x^3 y^3 z^2 w^2 u^3 v^4
++ x^3 y^3 z w^4 u^3 v^3
++ x^3 y^3 z w^3 u^4 v^3
++ x^3 y^3 z w^3 u^3 v^4
++ x^3 y^2 z^4 w^3 u^3 v^2
++ x^3 y^2 z^4 w^3 u^2 v^3
++ x^3 y^2 z^4 w^2 u^3 v^3
++ x^3 y^2 z^3 w^4 u^3 v^2
++ x^3 y^2 z^3 w^4 u^2 v^3
++ x^3 y^2 z^3 w^3 u^4 v^2
++ 5 x^3 y^2 z^3 w^3 u^3 v^3
++ x^3 y^2 z^3 w^3 u^2 v^4
++ x^3 y^2 z^3 w^2 u^4 v^3
++ x^3 y^2 z^3 w^2 u^3 v^4
++ x^3 y^2 z^2 w^4 u^3 v^3
++ x^3 y^2 z^2 w^3 u^4 v^3
++ x^3 y^2 z^2 w^3 u^3 v^4
++ x^3 y z^4 w^3 u^3 v^3
++ x^3 y z^3 w^4 u^3 v^3
++ x^3 y z^3 w^3 u^4 v^3
++ x^3 y z^3 w^3 u^3 v^4
++ x^2 y^4 z^3 w^3 u^3 v^2
++ x^2 y^4 z^3 w^3 u^2 v^3
++ x^2 y^4 z^3 w^2 u^3 v^3
++ x^2 y^4 z^2 w^3 u^3 v^3
++ x^2 y^3 z^4 w^3 u^3 v^2
++ x^2 y^3 z^4 w^3 u^2 v^3
++ x^2 y^3 z^4 w^2 u^3 v^3
++ x^2 y^3 z^3 w^4 u^3 v^2
++ x^2 y^3 z^3 w^4 u^2 v^3
++ x^2 y^3 z^3 w^3 u^4 v^2
++ 5 x^2 y^3 z^3 w^3 u^3 v^3
++ x^2 y^3 z^3 w^3 u^2 v^4
++ x^2 y^3 z^3 w^2 u^4 v^3
++ x^2 y^3 z^3 w^2 u^3 v^4
++ x^2 y^3 z^2 w^4 u^3 v^3
++ x^2 y^3 z^2 w^3 u^4 v^3
++ x^2 y^3 z^2 w^3 u^3 v^4
++ x^2 y^2 z^4 w^3 u^3 v^3
++ x^2 y^2 z^3 w^4 u^3 v^3
++ x^2 y^2 z^3 w^3 u^4 v^3
++ x^2 y^2 z^3 w^3 u^3 v^4
++ x y^4 z^3 w^3 u^3 v^3
++ x y^3 z^4 w^3 u^3 v^3
++ x y^3 z^3 w^4 u^3 v^3
++ x y^3 z^3 w^3 u^4 v^3
++ x y^3 z^3 w^3 u^3 v^4
+- x^4 y^4 z^3 w^3 u^3 v^2
+- x^4 y^4 z^3 w^3 u^2 v^3
+- x^4 y^4 z^3 w^2 u^3 v^3
+- x^4 y^4 z^2 w^3 u^3 v^3
+- x^4 y^3 z^4 w^3 u^3 v^2
+- x^4 y^3 z^4 w^3 u^2 v^3
+- x^4 y^3 z^4 w^2 u^3 v^3
+- x^4 y^3 z^3 w^4 u^3 v^2
+- x^4 y^3 z^3 w^4 u^2 v^3
+- x^4 y^3 z^3 w^3 u^4 v^2
+- 4 x^4 y^3 z^3 w^3 u^3 v^3
+- x^4 y^3 z^3 w^3 u^2 v^4
+- x^4 y^3 z^3 w^2 u^4 v^3
+- x^4 y^3 z^3 w^2 u^3 v^4
+- x^4 y^3 z^2 w^4 u^3 v^3
+- x^4 y^3 z^2 w^3 u^4 v^3
+- x^4 y^3 z^2 w^3 u^3 v^4
+- x^4 y^2 z^4 w^3 u^3 v^3
+- x^4 y^2 z^3 w^4 u^3 v^3
+- x^4 y^2 z^3 w^3 u^4 v^3
+- x^4 y^2 z^3 w^3 u^3 v^4
+- x^3 y^4 z^4 w^3 u^3 v^2
+- x^3 y^4 z^4 w^3 u^2 v^3
+- x^3 y^4 z^4 w^2 u^3 v^3
+- x^3 y^4 z^3 w^4 u^3 v^2
+- x^3 y^4 z^3 w^4 u^2 v^3
+- x^3 y^4 z^3 w^3 u^4 v^2
+- 4 x^3 y^4 z^3 w^3 u^3 v^3
+- x^3 y^4 z^3 w^3 u^2 v^4
+- x^3 y^4 z^3 w^2 u^4 v^3
+- x^3 y^4 z^3 w^2 u^3 v^4
+- x^3 y^4 z^2 w^4 u^3 v^3
+- x^3 y^4 z^2 w^3 u^4 v^3
+- x^3 y^4 z^2 w^3 u^3 v^4
+- x^3 y^3 z^4 w^4 u^3 v^2
+- x^3 y^3 z^4 w^4 u^2 v^3
+- x^3 y^3 z^4 w^3 u^4 v^2
+- 4 x^3 y^3 z^4 w^3 u^3 v^3
+- x^3 y^3 z^4 w^3 u^2 v^4
+- x^3 y^3 z^4 w^2 u^4 v^3
+- x^3 y^3 z^4 w^2 u^3 v^4
+- x^3 y^3 z^3 w^4 u^4 v^2
+- 4 x^3 y^3 z^3 w^4 u^3 v^3
+- x^3 y^3 z^3 w^4 u^2 v^4
+- 4 x^3 y^3 z^3 w^3 u^4 v^3
+- 4 x^3 y^3 z^3 w^3 u^3 v^4
+- x^3 y^3 z^3 w^2 u^4 v^4
+- x^3 y^3 z^2 w^4 u^4 v^3
+- x^3 y^3 z^2 w^4 u^3 v^4
+- x^3 y^3 z^2 w^3 u^4 v^4
+- x^3 y^2 z^4 w^4 u^3 v^3
+- x^3 y^2 z^4 w^3 u^4 v^3
+- x^3 y^2 z^4 w^3 u^3 v^4
+- x^3 y^2 z^3 w^4 u^4 v^3
+- x^3 y^2 z^3 w^4 u^3 v^4
+- x^3 y^2 z^3 w^3 u^4 v^4
+- x^2 y^4 z^4 w^3 u^3 v^3
+- x^2 y^4 z^3 w^4 u^3 v^3
+- x^2 y^4 z^3 w^3 u^4 v^3
+- x^2 y^4 z^3 w^3 u^3 v^4
+- x^2 y^3 z^4 w^4 u^3 v^3
+- x^2 y^3 z^4 w^3 u^4 v^3
+- x^2 y^3 z^4 w^3 u^3 v^4
+- x^2 y^3 z^3 w^4 u^4 v^3
+- x^2 y^3 z^3 w^4 u^3 v^4
+- x^2 y^3 z^3 w^3 u^4 v^4
++ x^4 y^4 z^4 w^3 u^3 v^3
++ x^4 y^4 z^3 w^4 u^3 v^3
++ x^4 y^4 z^3 w^3 u^4 v^3
++ x^4 y^4 z^3 w^3 u^3 v^4
++ x^4 y^3 z^4 w^4 u^3 v^3
++ x^4 y^3 z^4 w^3 u^4 v^3
++ x^4 y^3 z^4 w^3 u^3 v^4
++ x^4 y^3 z^3 w^4 u^4 v^3
++ x^4 y^3 z^3 w^4 u^3 v^4
++ x^4 y^3 z^3 w^3 u^4 v^4
++ x^3 y^4 z^4 w^4 u^3 v^3
++ x^3 y^4 z^4 w^3 u^4 v^3
++ x^3 y^4 z^4 w^3 u^3 v^4
++ x^3 y^4 z^3 w^4 u^4 v^3
++ x^3 y^4 z^3 w^4 u^3 v^4
++ x^3 y^4 z^3 w^3 u^4 v^4
++ x^3 y^3 z^4 w^4 u^4 v^3
++ x^3 y^3 z^4 w^4 u^3 v^4
++ x^3 y^3 z^4 w^3 u^4 v^4
++ x^3 y^3 z^3 w^4 u^4 v^4
++ x^4 y^4 z^4 w^4 u^4 v^4

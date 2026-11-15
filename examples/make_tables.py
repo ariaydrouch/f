@@ -111,8 +111,8 @@ def species_row(N, d):
                factors=[[list(a), m] for a, m in f.factors],
                specialised_degrees={str(k): v for k, v in spec_deg.items()},
                specialised_numerator=spec_num)
-    if d == 2:
-        row["numerator"] = [[list(m), c] for m, c in sorted(f.numerator.items())]
+    row["numerator"] = [[list(m), c] for m, c in
+                        sorted(f.numerator.items(), key=lambda t: (sum(t[0]), [-u for u in t[0]]))]
     row["orbits"] = [[list(m), c, n] for m, (c, n) in
                      sorted(f.orbits().items(), key=lambda t: (sum(t[0]), t[0]))]
     return row
@@ -143,27 +143,41 @@ def equal_block(label, numerator, degrees):
             f"  denominator: {equal_den({int(k): v for k, v in degrees.items()})}", ""]
 
 
-def md_species_n2(rows):
+VARS = ["x", "y", "z", "w", "u", "v", "t"]
+
+
+def poly_terms(numerator, names):
+    out = []
+    for m, c in numerator:
+        mon = mono(m, names)
+        if mon == "1":
+            out.append(str(c))
+        else:
+            out.append(("+ " if c > 0 else "- ") + ("" if abs(c) == 1 else f"{abs(c)} ") + mon)
+    return out
+
+
+def md_species_n2(rows, inline_max=5):
     L = ["## 1. N = 2, d = 1..7, matrix grading", "",
-         "Numerator in monomial symmetric functions: `m[2,1,1]` = sum of all distinct "
-         "permutations of x1^2 x2 x3.", ""]
+         "One variable per matrix: x, y, z, w, u, v, t.", ""]
     for r in rows:
         d = r["d"]
-        names = [f"x{a + 1}" for a in range(d)]
-        den = {}
-        for alpha, m in r["factors"]:
-            key = tuple(sorted((v for v in alpha if v), reverse=True))
-            den.setdefault(key, set()).add(m)
+        names = VARS[:d]
         L.append(f"### d = {d}")
         L.append("")
         L.append("```")
         L.append("denominator: " + " ".join(
-            f"(1-{mono(k + (0,) * (d - len(k)), names)})" + (f"^{max(ms)}" if max(ms) > 1 else "")
-            for k, ms in den.items()) + ("   (each over all permutations of the x's)" if d > 1 else ""))
-        L.append("numerator:")
-        for rep, c, n in r["orbits"]:
-            L.append(f"  {'m[' + ','.join(str(v) for v in rep if v) + ']' if any(rep) else '1'}: {c}")
-        L.append("```")
+            f"(1-{mono(a, names)})" + (f"^{m}" if m > 1 else "") for a, m in r["factors"]))
+        terms = poly_terms(r["numerator"], names)
+        if d <= inline_max:
+            L.append("numerator:   " + " ".join(terms))
+            L.append("```")
+        else:
+            fname = f"n2_d{d}_numerator.txt"
+            with open(os.path.join(DATA, fname), "w") as f:
+                f.write("\n".join(terms) + "\n")
+            L.append(f"numerator:   {len(terms)} terms, one per line in data/{fname}")
+            L.append("```")
         L.append("")
     return L
 
