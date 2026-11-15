@@ -140,7 +140,14 @@ def equal_den(deg):
 def equal_block(label, numerator, degrees):
     return [f"{label}",
             f"  numerator:   {fmt_coeffs(numerator)}",
-            f"  denominator: {equal_den({int(k): v for k, v in degrees.items()})}", ""]
+            f"  denominator: {equal_den({int(k): v for k, v in degrees.items()})}",
+            f"  max numerator degree: {max(k for k, c in enumerate(numerator) if c)}", ""]
+
+
+def max_degrees(numerator, names):
+    total = max(sum(m) for m, c in numerator)
+    each = ", ".join(f"{n} {max(m[i] for m, c in numerator)}" for i, n in enumerate(names))
+    return f"max numerator degree: total {total}; in each matrix: {each}"
 
 
 VARS = ["x", "y", "z", "w", "u", "v", "t"]
@@ -169,6 +176,7 @@ def md_species_n2(rows, inline_max=5):
         L.append("denominator: " + " ".join(
             f"(1-{mono(a, names)})" + (f"^{m}" if m > 1 else "") for a, m in r["factors"]))
         terms = poly_terms(r["numerator"], names)
+        L.append(max_degrees(r["numerator"], names))
         if d <= inline_max:
             L.append("numerator:   " + " ".join(terms))
             L.append("```")
@@ -209,8 +217,9 @@ def md_species_d2(rows):
         L.append("```")
         L.append("denominator: " + " ".join(
             f"(1-{mono(a, ['x', 'y'])})" + (f"^{m}" if m > 1 else "") for a, m in r["factors"]))
-        L.append("numerator:")
         num = [(tuple(m), c) for m, c in r["numerator"]]
+        L.append(max_degrees(num, ["x", "y"]))
+        L.append("numerator:")
         I = max(m[0] for m, _ in num)
         J = max(m[1] for m, _ in num)
         G = [[0] * (J + 1) for _ in range(I + 1)]

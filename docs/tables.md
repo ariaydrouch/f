@@ -8,6 +8,7 @@ One variable per matrix: x, y, z, w, u, v, t.
 
 ```
 denominator: (1-x) (1-x^2)
+max numerator degree: total 0; in each matrix: x 0
 numerator:   1
 ```
 
@@ -15,6 +16,7 @@ numerator:   1
 
 ```
 denominator: (1-x) (1-x^2) (1-y) (1-y^2) (1-x y)
+max numerator degree: total 0; in each matrix: x 0, y 0
 numerator:   1
 ```
 
@@ -22,6 +24,7 @@ numerator:   1
 
 ```
 denominator: (1-x) (1-x^2) (1-y) (1-y^2) (1-z) (1-z^2) (1-x y) (1-x z) (1-y z)
+max numerator degree: total 3; in each matrix: x 1, y 1, z 1
 numerator:   1 + x y z
 ```
 
@@ -29,6 +32,7 @@ numerator:   1 + x y z
 
 ```
 denominator: (1-x) (1-x^2) (1-y) (1-y^2) (1-z) (1-z^2) (1-w) (1-w^2) (1-x y) (1-x z) (1-x w) (1-y z) (1-y w) (1-z w)
+max numerator degree: total 8; in each matrix: x 2, y 2, z 2, w 2
 numerator:   1 + x y z + x y w + x z w + y z w - x^2 y z w - x y^2 z w - x y z^2 w - x y z w^2 - x^2 y^2 z^2 w^2
 ```
 
@@ -36,6 +40,7 @@ numerator:   1 + x y z + x y w + x z w + y z w - x^2 y z w - x y^2 z w - x y z^2
 
 ```
 denominator: (1-x) (1-x^2) (1-y) (1-y^2) (1-z) (1-z^2) (1-w) (1-w^2) (1-u) (1-u^2) (1-x y) (1-x z) (1-x w) (1-x u) (1-y z) (1-y w) (1-y u) (1-z w) (1-z u) (1-w u)
+max numerator degree: total 15; in each matrix: x 3, y 3, z 3, w 3, u 3
 numerator:   1 + x y z + x y w + x y u + x z w + x z u + x w u + y z w + y z u + y w u + z w u - x^2 y z w - x^2 y z u - x^2 y w u - x^2 z w u - x y^2 z w - x y^2 z u - x y^2 w u - x y z^2 w - x y z^2 u - x y z w^2 - 4 x y z w u - x y z u^2 - x y w^2 u - x y w u^2 - x z^2 w u - x z w^2 u - x z w u^2 - y^2 z w u - y z^2 w u - y z w^2 u - y z w u^2 + x^3 y z w u + x^2 y^2 z w u + x^2 y z^2 w u + x^2 y z w^2 u + x^2 y z w u^2 + x y^3 z w u + x y^2 z^2 w u + x y^2 z w^2 u + x y^2 z w u^2 + x y z^3 w u + x y z^2 w^2 u + x y z^2 w u^2 + x y z w^3 u + x y z w^2 u^2 + x y z w u^3 - x^2 y^2 z^2 w^2 - x^2 y^2 z^2 w u - x^2 y^2 z^2 u^2 - x^2 y^2 z w^2 u - x^2 y^2 z w u^2 - x^2 y^2 w^2 u^2 - x^2 y z^2 w^2 u - x^2 y z^2 w u^2 - x^2 y z w^2 u^2 - x^2 z^2 w^2 u^2 - x y^2 z^2 w^2 u - x y^2 z^2 w u^2 - x y^2 z w^2 u^2 - x y z^2 w^2 u^2 - y^2 z^2 w^2 u^2 + x^3 y^2 z^2 w^2 u + x^3 y^2 z^2 w u^2 + x^3 y^2 z w^2 u^2 + x^3 y z^2 w^2 u^2 + x^2 y^3 z^2 w^2 u + x^2 y^3 z^2 w u^2 + x^2 y^3 z w^2 u^2 + x^2 y^2 z^3 w^2 u + x^2 y^2 z^3 w u^2 + x^2 y^2 z^2 w^3 u + 4 x^2 y^2 z^2 w^2 u^2 + x^2 y^2 z^2 w u^3 + x^2 y^2 z w^3 u^2 + x^2 y^2 z w^2 u^3 + x^2 y z^3 w^2 u^2 + x^2 y z^2 w^3 u^2 + x^2 y z^2 w^2 u^3 + x y^3 z^2 w^2 u^2 + x y^2 z^3 w^2 u^2 + x y^2 z^2 w^3 u^2 + x y^2 z^2 w^2 u^3 - x^3 y^3 z^2 w^2 u^2 - x^3 y^2 z^3 w^2 u^2 - x^3 y^2 z^2 w^3 u^2 - x^3 y^2 z^2 w^2 u^3 - x^2 y^3 z^3 w^2 u^2 - x^2 y^3 z^2 w^3 u^2 - x^2 y^3 z^2 w^2 u^3 - x^2 y^2 z^3 w^3 u^2 - x^2 y^2 z^3 w^2 u^3 - x^2 y^2 z^2 w^3 u^3 - x^3 y^3 z^3 w^3 u^3
 ```
 
@@ -43,6 +48,7 @@ numerator:   1 + x y z + x y w + x y u + x z w + x z u + x w u + y z w + y z u +
 
 ```
 denominator: (1-x) (1-x^2) (1-y) (1-y^2) (1-z) (1-z^2) (1-w) (1-w^2) (1-u) (1-u^2) (1-v) (1-v^2) (1-x y) (1-x z) (1-x w) (1-x u) (1-x v) (1-y z) (1-y w) (1-y u) (1-y v) (1-z w) (1-z u) (1-z v) (1-w u) (1-w v) (1-u v)
+max numerator degree: total 24; in each matrix: x 4, y 4, z 4, w 4, u 4, v 4
 numerator:   1301 terms, one per line in data/n2_d6_numerator.txt
 ```
 
@@ -50,6 +56,7 @@ numerator:   1301 terms, one per line in data/n2_d6_numerator.txt
 
 ```
 denominator: (1-x) (1-x^2) (1-y) (1-y^2) (1-z) (1-z^2) (1-w) (1-w^2) (1-u) (1-u^2) (1-v) (1-v^2) (1-t) (1-t^2) (1-x y) (1-x z) (1-x w) (1-x u) (1-x v) (1-x t) (1-y z) (1-y w) (1-y u) (1-y v) (1-y t) (1-z w) (1-z u) (1-z v) (1-z t) (1-w u) (1-w v) (1-w t) (1-u v) (1-u t) (1-v t)
+max numerator degree: total 35; in each matrix: x 5, y 5, z 5, w 5, u 5, v 5, t 5
 numerator:   23512 terms, one per line in data/n2_d7_numerator.txt
 ```
 
@@ -61,74 +68,92 @@ Numerator coefficients from degree 0 upwards.
 d = 1
   numerator:   1
   denominator: (1-x) (1-x^2)
+  max numerator degree: 0
 
 d = 2
   numerator:   1
   denominator: (1-x)^2 (1-x^2)^3
+  max numerator degree: 0
 
 d = 3
   numerator:   1, 0, 0, 1
   denominator: (1-x)^3 (1-x^2)^6
+  max numerator degree: 3
 
 d = 4
   numerator:   1, 0, 1, 4, 1, 0, 1
   denominator: (1-x)^4 (1-x^2)^9
+  max numerator degree: 6
 
 d = 5
   numerator:   1, 0, 3, 10, 6, 6, 10, 3, 0, 1
   denominator: (1-x)^5 (1-x^2)^12
+  max numerator degree: 9
 
 d = 6
   numerator:   1, 0, 6, 20, 21, 36, 56, 36, 21, 20, 6, 0, 1
   denominator: (1-x)^6 (1-x^2)^15
+  max numerator degree: 12
 
 d = 7
   numerator:   1, 0, 10, 35, 55, 126, 220, 225, 225, 220, 126, 55, 35, 10, 0, 1
   denominator: (1-x)^7 (1-x^2)^18
+  max numerator degree: 15
 
 d = 8
   numerator:   1, 0, 15, 56, 120, 336, 680, 960, 1296, 1520, 1296, 960, 680, 336, 120, 56, 15, 0, 1
   denominator: (1-x)^8 (1-x^2)^21
+  max numerator degree: 18
 
 d = 9
   numerator:   1, 0, 21, 84, 231, 756, 1771, 3186, 5334, 7546, 8526, 8526, 7546, 5334, 3186, 1771, 756, 231, 84, 21, 0, 1
   denominator: (1-x)^9 (1-x^2)^24
+  max numerator degree: 21
 
 d = 10
   numerator:   1, 0, 28, 120, 406, 1512, 4060, 8856, 17605, 29512, 41392, 51520, 56056, 51520, 41392, 29512, 17605, 8856, 4060, 1512, 406, 120, 28, 0, 1
   denominator: (1-x)^10 (1-x^2)^27
+  max numerator degree: 24
 
 d = 11
   numerator:   1, 0, 36, 165, 666, 2772, 8436, 21582, 49581, 96580, 161424, 239625, 311724, 352080, 352080, 311724, 239625, 161424, 96580, 49581, 21582, 8436, 2772, 666, 165, 36, 0, 1
   denominator: (1-x)^11 (1-x^2)^30
+  max numerator degree: 27
 
 d = 12
   numerator:   1, 0, 45, 220, 1035, 4752, 16215, 47520, 123795, 275440, 533655, 919260, 1395505, 1867680, 2229525, 2369808, 2229525, 1867680, 1395505, 919260, 533655, 275440, 123795, 47520, 16215, 4752, 1035, 220, 45, 0, 1
   denominator: (1-x)^12 (1-x^2)^33
+  max numerator degree: 30
 
 d = 13
   numerator:   1, 0, 55, 286, 1540, 7722, 29260, 96525, 281127, 704275, 1550505, 3039400, 5280550, 8165080, 11321970, 14067823, 15650745, 15650745, 14067823, 11321970, 8165080, 5280550, 3039400, 1550505, 704275, 281127, 96525, 29260, 7722, 1540, 286, 55, 0, 1
   denominator: (1-x)^13 (1-x^2)^36
+  max numerator degree: 33
 
 d = 14
   numerator:   1, 0, 66, 364, 2211, 12012, 50116, 183612, 591228, 1647932, 4060980, 8925852, 17474380, 30641820, 48393060, 68865148, 88419540, 102727548, 108025412, 102727548, 88419540, 68865148, 48393060, 30641820, 17474380, 8925852, 4060980, 1647932, 591228, 183612, 50116, 12012, 2211, 364, 66, 0, 1
   denominator: (1-x)^14 (1-x^2)^39
+  max numerator degree: 36
 
 d = 15
   numerator:   1, 0, 78, 455, 3081, 18018, 82160, 330759, 1166880, 3583008, 9767472, 23791560, 51833496, 101614800, 180060192, 288812888, 420282720, 556256064, 670132320, 735182448, 735182448, 670132320, 556256064, 420282720, 288812888, 180060192, 101614800, 51833496, 23791560, 9767472, 3583008, 1166880, 330759, 82160, 18018, 3081, 455, 78, 0, 1
   denominator: (1-x)^15 (1-x^2)^42
+  max numerator degree: 39
 
 d = 16
   numerator:   1, 0, 91, 560, 4186, 26208, 129766, 569088, 2183181, 7323680, 21876855, 58494800, 140380240, 304209920, 597685296, 1066948064, 1735244616, 2577242304, 3500061656, 4351130784, 4956940352, 5177121664, 4956940352, 4351130784, 3500061656, 2577242304, 1735244616, 1066948064, 597685296, 304209920, 140380240, 58494800, 21876855, 7323680, 2183181, 569088, 129766, 26208, 4186, 560, 91, 0, 1
   denominator: (1-x)^16 (1-x^2)^45
+  max numerator degree: 42
 
 d = 17
   numerator:   1, 0, 105, 680, 5565, 37128, 198485, 941460, 3902535, 14201460, 46122687, 134310540, 352063075, 835629900, 1802871915, 3545160178, 6372292710, 10494916290, 15863146390, 22037626170, 28174359486, 33173173930, 35989379790, 35989379790, 33173173930, 28174359486, 22037626170, 15863146390, 10494916290, 6372292710, 3545160178, 1802871915, 835629900, 352063075, 134310540, 46122687, 14201460, 3902535, 941460, 198485, 37128, 5565, 680, 105, 0, 1
   denominator: (1-x)^17 (1-x^2)^48
+  max numerator degree: 45
 
 d = 18
   numerator:   1, 0, 120, 816, 7260, 51408, 295240, 1505520, 6706518, 26314640, 92311752, 290818320, 826718620, 2132858352, 5012949240, 10766390768, 21193997445, 38333911440, 63826042208, 97992605760, 138926022576, 182060265920, 220717610400, 247695342336, 257394807800, 247695342336, 220717610400, 182060265920, 138926022576, 97992605760, 63826042208, 38333911440, 21193997445, 10766390768, 5012949240, 2132858352, 826718620, 290818320, 92311752, 26314640, 6706518, 1505520, 295240, 51408, 7260, 816, 120, 0, 1
   denominator: (1-x)^18 (1-x^2)^51
+  max numerator degree: 48
 
 ```
 
@@ -140,22 +165,27 @@ Numerator coefficients from degree 0 upwards.
 N = 2
   numerator:   1
   denominator: (1-x)^2 (1-x^2)^3
+  max numerator degree: 0
 
 N = 3
   numerator:   1, 0, 0, 0, 0, 0, 1
   denominator: (1-x)^2 (1-x^2)^3 (1-x^3)^4 (1-x^4)
+  max numerator degree: 6
 
 N = 4
   numerator:   1, 0, 0, 0, 0, 1, 3, 2, 4, 4, 2, 3, 3, 2, 4, 4, 2, 3, 1, 0, 0, 0, 0, 1
   denominator: (1-x)^2 (1-x^2)^3 (1-x^3)^4 (1-x^4)^6 (1-x^5) (1-x^6)
+  max numerator degree: 23
 
 N = 5
   numerator:   1, 0, 0, 0, 0, 1, 3, 8, 13, 16, 23, 27, 41, 53, 82, 123, 167, 213, 265, 314, 354, 395, 453, 501, 552, 594, 621, 621, 594, 552, 501, 453, 395, 354, 314, 265, 213, 167, 123, 82, 53, 41, 27, 23, 16, 13, 8, 3, 1, 0, 0, 0, 0, 1
   denominator: (1-x)^2 (1-x^2)^3 (1-x^3)^4 (1-x^4)^6 (1-x^5)^7 (1-x^6)^4
+  max numerator degree: 53
 
 N = 6
   numerator:   1, 0, 0, 0, 0, 0, 3, 12, 19, 32, 52, 72, 122, 188, 337, 564, 946, 1516, 2378, 3648, 5448, 8080, 11842, 17120, 24518, 34612, 48232, 66140, 89438, 119160, 156410, 202660, 258910, 326656, 406690, 500052, 606950, 727280, 860398, 1004748, 1158471, 1318712, 1482246, 1645508, 1804138, 1953968, 2090373, 2209328, 2306572, 2378532, 2423106, 2438024, 2423106, 2378532, 2306572, 2209328, 2090373, 1953968, 1804138, 1645508, 1482246, 1318712, 1158471, 1004748, 860398, 727280, 606950, 500052, 406690, 326656, 258910, 202660, 156410, 119160, 89438, 66140, 48232, 34612, 24518, 17120, 11842, 8080, 5448, 3648, 2378, 1516, 946, 564, 337, 188, 122, 72, 52, 32, 19, 12, 3, 0, 0, 0, 0, 0, 1
   denominator: (1-x)^2 (1-x^2)^3 (1-x^3)^4 (1-x^4)^6 (1-x^5)^8 (1-x^6)^11 (1-x^8)^3
+  max numerator degree: 102
 
 ```
 
@@ -167,6 +197,7 @@ Numerator grid: row i = power of x, column j = power of y.
 
 ```
 denominator: (1-x) (1-x^2) (1-y) (1-y^2) (1-x y)
+max numerator degree: total 0; in each matrix: x 0, y 0
 numerator:
 i\j 0
   0 1
@@ -176,6 +207,7 @@ i\j 0
 
 ```
 denominator: (1-x) (1-x^2) (1-x^3) (1-y) (1-y^2) (1-y^3) (1-x y) (1-x^2 y^2) (1-x^2 y) (1-x y^2)
+max numerator degree: total 6; in each matrix: x 3, y 3
 numerator:
 i\j 0 1 2 3
   0 1 0 0 0
@@ -188,6 +220,7 @@ i\j 0 1 2 3
 
 ```
 denominator: (1-x) (1-x^2) (1-x^3) (1-x^4) (1-y) (1-y^2) (1-y^3) (1-y^4) (1-x y) (1-x^2 y^2)^2 (1-x^2 y) (1-x^4 y^2) (1-x y^2) (1-x^2 y^4) (1-x^3 y) (1-x y^3)
+max numerator degree: total 24; in each matrix: x 12, y 12
 numerator:
 i\j  0  1  2  3  4  5  6  7  8  9 10 11 12
   0  1  0  0  0  0  0  0  0  0  0  0  0  0
@@ -209,6 +242,7 @@ i\j  0  1  2  3  4  5  6  7  8  9 10 11 12
 
 ```
 denominator: (1-x) (1-x^2) (1-x^3) (1-x^4) (1-x^5) (1-y) (1-y^2) (1-y^3) (1-y^4) (1-y^5) (1-x y)^2 (1-x^2 y^2)^2 (1-x^2 y)^3 (1-x y^2)^3 (1-x^3 y)^2 (1-x y^3)^2 (1-x^4 y) (1-x^3 y^2) (1-x^2 y^3) (1-x y^4)
+max numerator degree: total 46; in each matrix: x 23, y 23
 numerator:
 i\j   0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  20  21  22  23
   0   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
