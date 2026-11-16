@@ -16,6 +16,7 @@ The project is built up in deliberately small, testable versions.
 | `BTP_version3.ipynb` | top view, substrate friction | **full model: Stokes flow, active stress, Frank/elastic stress, vorticity, flow alignment, anchoring, adhesion** | **cell morphologies: aster, lamellipodium, cup** |
 | `BTP_version3_run_and_tumble.ipynb` | same physics as Version 3 | a decision layer: pick a random direction, deform and crawl that way for a (random) distance, switch activity off and relax back to a circle, repeat | **stop-and-go migration with repeated repolarisation** |
 | `BTP_version3_two_cell_walk.ipynb` | same physics, closed box (soft walls) | two cells, each running its own decide/move/relax walk, sharing one Stokes solve; a steric term keeps them from merging | **collision → deformation and mutual rotation → redirect, executed and verified** |
+| `BTP_version3_two_cell_scattering.ipynb` | same two-cell model | a longer-range repulsion whose strength is the product of the two cells' areas, plus the overdamped torque balance $\tau=\xi_{\rm rot}\omega$ | **an offset approach misses and the headings turn by anchoring; head-on, the torque stays zero; a smaller cell is deflected more** |
 
 Versions 2 and 3 are complementary rather than sequential: the protrusion of
 Fig. 1 of the paper is a *near-substrate* structure and needs the side view,
@@ -212,6 +213,25 @@ touching — confirmed, not assumed), and a clean path plot showing
 both cells visibly deflect at contact rather than cross straight
 through each other. `two_cell_walk.mp4` is a 46-frame, 8 fps video of
 the whole run, polarization arrows included.
+
+## A repulsion with a range, and the torque it exerts: `BTP_version3_two_cell_scattering.ipynb`
+
+The contact repulsion of the walk above is zero until the interfaces overlap, so making it stronger cannot steer a cell before a collision. This notebook keeps that term ($k_{\rm rep}=20$, unchanged) and adds a screened piece of range $\lambda=8$,
+
+$$F_{\rm soft}=k_{\rm soft}\,q_1 q_2\int\rho_1\psi_2\,dA,\qquad q_i=A_i/A_0,\qquad (1-\lambda^2\nabla^2)\psi_i=\phi_i^2,$$
+
+with $k_{\rm soft}=15$. The force enters the same shared Stokes solve. The torque about each centre of mass is turned into a rotation of $\mathbf P$ by the overdamped balance $\tau=\xi_{\rm rot}\omega$, where $\xi_{\rm rot}=\xi\int\phi|\mathbf r-\mathbf r_{\rm cm}|^2\,dA$ is computed from the cell rather than chosen ($5.1\times 10^{4}$ here). There is no inertial angular momentum: the model has no $\partial_t\mathbf v$.
+
+Executed checks, all at the Version 3 parameters:
+
+- **Round cells, held fixed.** The force on the two cells sums to $\sim 10^{-11}$. Doubling one cell's charge doubles the force on both, from $11.7$ to $23.4$. The torque on a round cell is $\sim 10^{-2}$ off-axis and $\sim 10^{-15}$ head-on.
+- **Offset approach, long-range piece on.** Closest approach $36.8$ against a contact distance of $26$, overlap $0$, headings turn by $35^\circ$. The rigid rotation $\int\omega\,dt$ over that run is $0.28^\circ$. Switching anchoring off cuts the heading change to $0.4^\circ$ and the cells still miss, so the turn is the polarity staying normal to an edge the repulsion has deformed.
+- **Same approach, long-range piece off.** Closest approach $18.3$, overlap peaks at $3.9$, headings rotate by about $16^\circ$, of which the rigid channel is $1.9^\circ$. This is the previous notebook's collision.
+- **Head-on.** Peak torque $10^{-6}$. The centres come in to $28.7$ and recede with no overlap. $|\langle\mathbf P\rangle|$ falls from $1$ to $0.06$ while the local order dips and recovers; the heading does not rotate.
+- **Unequal cells** ($R=13$ and $R=9$, so $q=1.02$ and $0.50$). The smaller cell's heading turns by $45^\circ$, the larger by $12^\circ$.
+- **The walk**, same redirect rule as before, $t=50$. The opening approach misses (closest $28.9$, overlap $0$, the collision trigger never fires) and both paths bend apart while the cells are still in their move phase.
+
+Figures and the videos are in `two_cell_scattering_media/`.
 
 ## Next steps
 
