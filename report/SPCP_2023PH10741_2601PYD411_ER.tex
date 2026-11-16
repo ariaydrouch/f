@@ -167,7 +167,51 @@ Each cell also runs a decide--move--relax cycle. It picks a heading, crawls unti
 \label{sec:results}
 
 \noindent
-The single-cell stages are summarised here and were reported in full at mid-term. Version 1, with $\mathbf{v}=\zeta=\beta=0$, translates a disc and cannot change its shape, and non-conservative advection costs 4.5\% of the area. Version 2 is a vertical slice with the wall at $z=0$ and a treadmilling speed confined to a near-wall layer. At $w_{0}=0.3$ the cell remains a hemispherical cap, with contact length 44.0 and speed 0.050; at $w_{0}=2.0$ it draws a thin leading protrusion, with contact length 63.0 and speed 0.432. The volume error is $10^{-16}$. Version 3 recovers the shapes of Ref.~\cite{Tjhung:2015} in the plane. Strong anchoring locks $\mathbf{P}$ into a radial aster, with $|\langle\mathbf{P}\rangle|=0$ and zero speed, the fried egg seen in Ref.~\cite{Yam:2007}. Moderate anchoring gives a fan of aspect ratio 2.91 crawling at speed $0.843\approx w_{0}$. A passive ellipse relaxes to a circle and the flow dies. Switching anchoring against the flow shows that the fan is set by anchoring: the flow adds about 2\% to the aspect ratio once anchoring is on. No planar pseudopod or phagocytic cup appears. Both need the third dimension, and the pseudopod is the structure Version 2 already produces. Version 4, the Darcy reduction with contractility recalibrated to $\zeta=-0.25$, travels 239.9 length units in time 299 at a steady speed 0.801, with the aspect ratio saturating near 3.2. The soft area penalty lets the cell spread by about 15\%, the thickness implied by a fixed volume falling by the same factor. With the penalty removed the cell inflates by a factor of about 14 and crawling is lost. Where Version 4 and Version 3 describe the same limit they agree to 0.2\%, and Version 4 is about five times faster.
+\textbf{Version 1.} With $\mathbf{v}=\zeta=\beta=0$ a disc translates and cannot change its shape, because a uniform $\mathbf{P}$ gives a uniform $\mathbf{u}$. Non-conservative advection costs 4.5\% of the area. There is no graph worth showing: the shape does not change.
+
+\textbf{Version 2: protrusion at the wall.}
+The thin protrusion of Ref.~\cite{Tjhung:2015} is a near-substrate structure, so this stage is a vertical slice with the wall at $z=0$,
+$w(z)=\frac{w_{0}}{2}\bigl[1-\tanh((z-\lambda)/w_{\tau})\bigr]$,
+and the Brinkman closure $(1-\ell_{v}^{2}\partial_{z}^{2})\mathbf{u}=w(z)\mathbf{P}$.
+At $w_{0}=0.3$ the cell stays a hemispherical cap (contact length 44.0, speed 0.050). At $w_{0}=2.0$ it draws a thin leading layer (contact 63.0, speed 0.432). The volume error is $10^{-16}$. Sweeping $w_{0}$ (Figure \ref{fig:v2}) shows the transition: the contact length is nearly flat below $w_{0}\approx 0.8$ and then rises, close to $M\varepsilon^{2}/\lambda\approx 0.75$.
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=13.2cm,height=3.4cm,keepaspectratio]{figures/fig_v2_shapes.pdf}\\[2pt]
+\includegraphics[width=13.2cm,height=2.1cm,keepaspectratio]{figures/fig_v2_transition.pdf}
+\caption{Version 2. Top: vertical slice, wall at $z=0$. Left, $w_{0}=0.3$, a hemispherical cap. Right, $w_{0}=2.0$, a thin leading protrusion. Arrows are $\mathbf{P}$. Bottom: contact length, lamella length and crawl speed against $w_{0}$.}
+\label{fig:v2}
+\end{figure}
+
+\textbf{Version 3: shapes in the plane.}
+A passive ellipse relaxes to a circle (aspect $1.689\to 1.010$), the free energy falls, the flow dies and the volume error is zero. With activity (Figure \ref{fig:v3}), strong anchoring locks $\mathbf{P}$ into a radial aster, $|\langle\mathbf{P}\rangle|=0$ and the speed is zero, the fried egg of Ref.~\cite{Yam:2007}. Moderate anchoring gives a fan of aspect 2.91 at speed $0.843\approx w_{0}$. A harder anchoring gives aspect 4.35. The $2\times 2$ underneath isolates the cause: anchoring alone takes the aspect from 1.07 to 2.85, and adding the flow reaches 2.92, about 2\% more. No planar pseudopod or cup appears. Both need the third dimension, and the pseudopod is what Version 2 already shows from the side.
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=13.2cm,height=4.4cm,keepaspectratio]{figures/fig_v3_morph.pdf}\\[2pt]
+\includegraphics[width=13.2cm,height=2.2cm,keepaspectratio]{figures/fig_v3_decomp.pdf}
+\caption{Version 3 at $w_{0}=1$. Top: $\phi$ and $\mathbf{P}$, and the flow underneath. (a) Aster, not motile. (b) Lamellipodial fan, aspect 2.91, speed 0.843. (c) Stronger fan, aspect 4.35. Bottom: anchoring against flow. Anchoring alone gives aspect 2.85; anchoring and flow together give 2.92.}
+\label{fig:v3}
+\end{figure}
+
+\textbf{Version 4: crawling without the Stokes solve.}
+Only the active part $\mathbf{v}=-(\zeta/\xi)\nabla\cdot(\phi\mathbf{P}\mathbf{P})$ is kept, with $\zeta=-0.25$. Figure \ref{fig:v4} is the crawl. The cell travels 239.9 length units in time 299 at speed 0.801, the aspect ratio saturates near 3.2, $A/A_{0}$ grows by about 15\% and the thickness implied by a fixed volume falls by the same factor. Where Version 4 and Version 3 describe the same limit they agree to 0.2\%. Figure \ref{fig:v4area} is the soft-volume check: $k_{A}=0$ inflates the cell about 14-fold and crawling stops, while $k_{A}=5$ is the value used for the crawl above.
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=13.4cm,height=2.4cm,keepaspectratio]{figures/fig_v4_montage.pdf}\\[1pt]
+\includegraphics[width=13.4cm,height=2.4cm,keepaspectratio]{figures/fig_v4_snapshots.pdf}\\[1pt]
+\includegraphics[width=13.4cm,height=1.85cm,keepaspectratio]{figures/fig_v4_diagnostics.pdf}
+\caption{Version 4 crawling. Top: laboratory-frame outlines coloured by time; travel 239.9 at speed 0.801. Middle: $\phi$ at $t=0$, 100 and 299, with the mean $\mathbf{P}$ as a red arrow. Bottom: $x_{\mathrm{cm}}$, speed, aspect ratio, $A/A_{0}$ and $h/h_{0}$.}
+\label{fig:v4}
+\end{figure}
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=13.4cm,height=3.2cm,keepaspectratio]{figures/fig_v4_area.pdf}
+\caption{Soft volume in Version 4. Area and aspect ratio against time for several $k_{A}$, and the steady area and thickness. $k_{A}=0$ (dashed) runs away. Stiffer $k_{A}$ holds the area closer to $A_{0}$ and lets the cell thin less.}
+\label{fig:v4area}
+\end{figure}
 
 \subsection{Contact, with the long-range repulsion off}
 \label{sec:contact}
@@ -178,7 +222,7 @@ The same initial condition was then repeated inside the later study with $k_{\rm
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=\textwidth]{figures/offset_collision.png}
+\includegraphics[width=\textwidth,height=4.3cm,keepaspectratio]{figures/offset_collision.png}
 \caption{Offset approach with the long-range repulsion switched off. Left: centres of mass; the cells meet and then separate. Centre: separation falls through the nominal contact distance (dashed), and the overlap (purple) peaks near 3.9. Right: the headings rotate by about $16^{\circ}$. The dashed curve is the rigid rotation from equation (\ref{eq:torque}), about $1.9^{\circ}$.}
 \label{fig:collision}
 \end{figure}
@@ -190,7 +234,7 @@ With $\lambda=8$ and $k_{\rm soft}=15$, and with the same offset, the cells neve
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=\textwidth]{figures/offset_avoidance.png}
+\includegraphics[width=\textwidth,height=4.3cm,keepaspectratio]{figures/offset_avoidance.png}
 \caption{The same offset approach with the long-range repulsion on. The separation stays above the contact distance (dashed) and the overlap is zero throughout, so it is omitted from the middle panel. The headings turn by $35^{\circ}$. The dashed curve, the rigid rotation from the steric torque, moves by $0.28^{\circ}$.}
 \label{fig:avoid}
 \end{figure}
@@ -199,7 +243,7 @@ Head-on, the offset is removed and symmetry puts the force and both headings on 
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=0.92\textwidth]{figures/headon.png}
+\includegraphics[width=0.92\textwidth,height=3.6cm,keepaspectratio]{figures/headon.png}
 \caption{Head-on approach with the same long-range repulsion. Left: the centres come in to 28.7 and recede, staying above contact. Right: $|\langle\mathbf{P}\rangle|$ (solid) falls through the compression, while the local order $\langle|\mathbf{P}|\rangle$ (dashed) dips and recovers. The torque on this run is $10^{-6}$.}
 \label{fig:headon}
 \end{figure}
@@ -208,12 +252,19 @@ The cell dependence was checked in two ways. Held fixed and round, with one char
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=\textwidth]{figures/unequal_cells.png}
+\includegraphics[width=\textwidth,height=4.3cm,keepaspectratio]{figures/unequal_cells.png}
 \caption{Offset approach between a cell of radius 13 and a cell of radius 9. The smaller cell (red) is thrown further aside and its heading turns by $45^{\circ}$, against $12^{\circ}$ for the larger cell. The overlap stays at zero. The dashed curve is again the rigid rotation, a fraction of a degree.}
 \label{fig:unequal}
 \end{figure}
 
-Finally the decide--move--relax walk was repeated with equation (\ref{eq:soft}) left on, in the closed box, for a duration of 50. The two cells start aimed at each other. They pass with a closest separation of 28.9 and an overlap of zero, so the collision trigger never fires, and both are still in the move phase at the end. The redirection rule written for a genuine overlap is unchanged from the earlier walk. It simply has nothing to act on in this approach.
+Finally the decide--move--relax walk was repeated with equation (\ref{eq:soft}) left on, in the closed box, for a duration of 50 (Figure \ref{fig:walk}). The two cells start aimed at each other. They pass with a closest separation of 28.9 and an overlap of zero, so the collision trigger never fires, and both are still in the move phase at the end. The redirection rule written for a genuine overlap is unchanged from the earlier walk. It simply has nothing to act on in this approach.
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=7.2cm]{figures/walk_path.png}
+\caption{The closed-box walk with the long-range repulsion on. Dots are the starting positions. The dashed square is the soft wall. The paths bend apart and the cells do not meet.}
+\label{fig:walk}
+\end{figure}
 
 \begin{table}[ht!]
 \begin{center}
