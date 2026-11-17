@@ -283,28 +283,6 @@ The second run starts the cells 50 apart with an impact parameter of 5, so the f
 \label{fig:glanceresp}
 \end{figure}
 
-\FloatBarrier
-\subsection{Four cells}
-\label{sec:four}
-
-The same idea, one field pair per cell and one shared Stokes solve, was then run with four cells for a time of 400 (Figure \ref{fig:fourpaths}). They start as two opposing pairs on tracks offset by a few length units, so the meetings are glancing rather than head-on. The normal repulsion has strength 60. On top of it, a tangential contact law acts only while the gap is inside a range of 6: relative slip along the contact is opposed by an equal-and-opposite force, and that force, acting off the centre, sets a spin. The friction coefficient is 0.35 and the spin coupling is 1.2. Both are chosen parameters of a coarse contact law, not a result derived from the free energy.
-
-The four paths stay inside the soft wall and keep their own colours: the cells do not coalesce. The strongest overlap anywhere on the grid, the largest value of $\phi_{i}\phi_{j}$ at a single point, is 0.091. Figure \ref{fig:fourspin} shows the contact torque and the spin it produces. Both sit near zero between meetings and rise together when a pair comes into range. The mean heading also jumps when the decide--move--relax rule picks a new direction, so the large net change in angle over the whole run is not all contact torque.
-
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=0.52\textwidth]{figures/multi_cell_trajectories.png}
-\caption{Four cells in the closed box, tracked separately through time 400. The dashed square is the soft wall. Each colour is one cell.}
-\label{fig:fourpaths}
-\end{figure}
-
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=0.50\textwidth]{figures/multi_cell_collision.png}
-\caption{Contact response of the same run. Torque and spin are quiet except in bursts, and the bursts line up. The lowest panel is the unwrapped mean heading, which also jumps when a cell is assigned a new direction.}
-\label{fig:fourspin}
-\end{figure}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \FloatBarrier
@@ -314,7 +292,7 @@ The four paths stay inside the soft wall and keep their own colours: the cells d
 \noindent
 The four single-cell stages do what they were built to do. Volume is conserved where the constraint demands it. A treadmilling layer at a wall produces a protrusion and a change of shape with $w_{0}$. The planar model produces the aster and the lamellipodial fan, and the fan is set by anchoring. The friction-dominated reduction crawls at speed 0.801 and is the practical single-cell model, but a collision has to be computed with the shared Stokes solve, because that is the channel through which one cell pushes the other.
 
-Two cells with independent fields and the contact penalty of equation (\ref{eq:contact}) do not merge. In the closed-box walk the overlap reaches 2.07, against about 8.7 for a non-interacting pair at nominal contact, and an off-centre contact with fixed headings rotates each of them by $8.8^{\circ}$. Giving the repulsion a range changes the outcome with the geometry. An offset approach misses, and the heading turns because anchoring follows the deformed edge. A head-on approach cannot turn: the torque vanishes, the cells stop short of contact and separate, and the mean polarization loses coherence instead of rotating. The overdamped balance (\ref{eq:torque}) is the angular statement of the same approximation already made for the linear force. At these parameters it contributes a fraction of a degree on a miss and about two degrees in a hard contact. It is kept, and it is not rescaled to imitate a rigid-body collision. The same tangential law, in a run that is started glancing, drives the centres within 0.55 of each other and still returns two cells, with the torque and the spin rising together. Four cells on the same law stay distinct as well: the pointwise overlap $\phi_{i}\phi_{j}$ never exceeds 0.091.
+Two cells with independent fields and the contact penalty of equation (\ref{eq:contact}) do not merge. In the closed-box walk the overlap reaches 2.07, against about 8.7 for a non-interacting pair at nominal contact, and an off-centre contact with fixed headings rotates each of them by $8.8^{\circ}$. Giving the repulsion a range changes the outcome with the geometry. An offset approach misses, and the heading turns because anchoring follows the deformed edge. A head-on approach cannot turn: the torque vanishes, the cells stop short of contact and separate, and the mean polarization loses coherence instead of rotating. The overdamped balance (\ref{eq:torque}) is the angular statement of the same approximation already made for the linear force. At these parameters it contributes a fraction of a degree on a miss and about two degrees in a hard contact. It is kept, and it is not rescaled to imitate a rigid-body collision. The same tangential law, in a run that is started glancing, drives the centres within 0.55 of each other and still returns two cells, with the torque and the spin rising together.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -322,7 +300,7 @@ Two cells with independent fields and the contact penalty of equation (\ref{eq:c
 \label{sec:scope}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \noindent
-The friction $\xi$ is still constant, so the biphasic speed of Ref.~\cite{Leoni:2017} cannot appear. A friction that depends on the local speed, together with a cycle in the activity, is the test of that prediction. Coupling the vertical slice of Version 2 to the planar solver of Version 3 would put the pseudopod and the top-view shapes in one calculation. The tangential contact law used for four cells, and the random new heading after a collision, are both policies with chosen coefficients. Replacing either by a rule that follows from the free energy is the open step.
+The friction $\xi$ is still constant, so the biphasic speed of Ref.~\cite{Leoni:2017} cannot appear. A friction that depends on the local speed, together with a cycle in the activity, is the test of that prediction. Coupling the vertical slice of Version 2 to the planar solver of Version 3 would put the pseudopod and the top-view shapes in one calculation. The tangential contact law, and the random new heading after a collision, are both policies with chosen coefficients. Replacing either by a rule that follows from the free energy is the open step.
 
 \section*{Acknowledgements}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
