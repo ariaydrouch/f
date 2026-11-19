@@ -1,0 +1,189 @@
+\documentclass[a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=5.2mm,top=4.8mm,bottom=6.2mm]{geometry}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{multicol}
+\usepackage{microtype}
+\usepackage{enumitem}
+\setlist[itemize]{nosep,leftmargin=1.15em,topsep=0.5pt,itemsep=0.2pt,parsep=0pt}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55pt}
+\setlength{\columnsep}{2.5mm}
+\setlength{\columnseprule}{0.45pt}
+\setlength{\abovedisplayskip}{1.2pt}
+\setlength{\belowdisplayskip}{1.2pt}
+\setlength{\abovedisplayshortskip}{0.6pt}
+\setlength{\belowdisplayshortskip}{0.6pt}
+\setlength{\multicolsep}{0pt}
+\newcommand{\sect}[1]{\par\vspace{1.15pt}\noindent{\bfseries #1}\par\vspace{0.15pt}\noindent\rule{\linewidth}{0.35pt}\par\vspace{0.25pt}}
+\newcommand{\eq}[1]{\par\vspace{0.15pt}\noindent\hspace{0.4pt}\rule[-0.15em]{0.7pt}{0.95em}\hspace{2pt}$\displaystyle #1$\par\vspace{0.1pt}}
+\begin{document}
+\fontsize{7.4}{8.7}\selectfont
+\begin{center}
+{\bfseries\fontsize{9}{10}\selectfont PYL7590 --- Computational Optical Imaging}\\[-1pt]
+{\fontsize{6.4}{7.4}\selectfont Two-sided A4. Lecture notation (Khare). Define symbols. State the convention before a phase.}
+\end{center}
+\vspace{-2pt}
+\begin{multicols}{2}
+
+\sect{1. PSF, OTF (incoherent)}
+Coherent impulse response $h$. Incoherent PSF is $|h|^2$ (L21, (156)--(157)):
+\eq{I_{\mathrm{out}}(x,y)=\iint |h(x-x',y-y')|^2\,I_{\mathrm{in}}(x',y')\,dx'dy'}
+\eq{\mathrm{OTF}(f_x,f_y)=\frac{\mathcal{F}\{|h|^2\}}{\mathcal{F}\{|h|^2\}(0,0)}}
+$\mathrm{MTF}=|\mathrm{OTF}|$ (contrast only). OTF carries amplitude and phase. MTF near 0: that frequency is lost. High-frequency loss means less fine detail.
+
+\sect{2. Blur model and Wiener filter}
+\eq{g=f*h+n,\qquad G=FH+N}
+Inverse $F=G/H$ explodes where $H$ is small and cannot fill exact zeros.
+\eq{\hat F=\frac{H^{*}}{|H|^2+K}\,G}
+$H^{*}$ is the conjugate. $K$ is a noise-to-signal constant. Large $|H|$: nearly inverse. Small $|H|$: the denominator limits the gain. Lecture N=1 case of the generalized Wiener filter (L23, (187)) is the same formula with $K=S_{\mathrm{noise}}/S_{\mathrm{obj}}$.
+
+\sect{3. Motion blur and coded shutter}
+Open shutter, constant horizontal speed: the PSF is a uniform line. Blur length $d=vT$.
+\eq{h(x)=1/d,\ 0\le x\le d;\quad H(f)=e^{-i\pi fd}\operatorname{sinc}(fd)}
+\eq{\operatorname{sinc}(u)=\sin(\pi u)/(\pi u)}
+Sinc OTF has regular zeros. Near a zero, deconvolution amplifies noise; at a zero that frequency is absent.
+\eq{h(x)=\frac{\sum_i c_i\delta(x-vt_i)}{\sum_i c_i},\quad
+H(f)=\frac{\sum_i c_i e^{-i2\pi f vt_i}}{\sum_i c_i}}
+$c_i\in\{0,1\}$. ON/OFF code samples the moving point: a sparse PSF. A good code can reduce deep nulls. It does not remove every zero. Both PSFs are deconvolved with Wiener. \textbf{Exam sketch:} open shutter $=$ line PSF $+$ sinc with zeros; coded $=$ impulses $+$ a spectrum with shallower nulls, so Wiener recovery keeps more detail.
+
+\sect{4. Compact lensless phase imaging}
+No imaging lens. Collimated laser, sparse sample (RBCs), sensor records $I=|U|^2$. Phase is missing. Highest frequency from detector half-angle: $f_{\max}=\sin\theta/\lambda$. Ideal Nyquist (2 samples per cycle):
+\eq{p\le\frac{1}{2f_{\max}}=\frac{\lambda}{2\sin\theta}}
+Lecture camera rule (L13, (107)), because a pixel averages area, not a delta: fringe period $1/f_0\ge 4p$, with $f_0=(\sin\theta)/\lambda$. So the practical pitch is about half the ideal Nyquist pitch. Find $z$ by back-propagating trial distances and picking the sharpest plausible RBC (a sharpness or gradient-sparsity metric).
+
+\sect{5. Gerchberg--Saxton and HIO}
+Recover $g$ from $|G|=\mathcal{F}\{g\}$. Any phase on $|G|$ matches the data; constraints select the solution. \textbf{GS (1972).} (1) Start from $\sqrt{I}$ and a guessed phase. (2) Propagate to the object. (3) Apply constraints. (4) Propagate back. (5) Replace the detector amplitude by $\sqrt{I}$; keep the phase. (6) Repeat. Recovered phase $\varphi=\arg(U)$.
+Constraints (L18): \emph{support} $=$ bounding box of the beam; \emph{positivity} (amplitude objects only) $=$ real part inside the support, then set negatives to 0; \emph{sparsity} reduces artifacts.
+\textbf{HIO} (Fienup 1979), negative feedback. Let $g'_n$ be the field after the $|G|$ step. Where support and positivity hold,
+\eq{g_{n+1}=g'_n}
+otherwise
+\eq{g_{n+1}=g_n-\beta g'_n}
+Slide illustration uses $\beta=0.9$. No formal proof; it converges better than GS. Leftover artifacts: a few TV steps inside HIO clean them. Twin stagnation: $g(x,y)$ and $g^{*}(-x,-y)$ share $|G|$, and the iterate mixes both. A non-centrosymmetric support (or illumination) removes the twin, because the twin of a half-object does not fit the same support. Positivity cannot be used for a phase object.
+
+\sect{6. Off-axis holography and FTM}
+Lecture interference record, coherence factor $\gamma$ (take $\gamma=1$) (L13, (104)):
+\eq{H=|R|^2+|O|^2+\gamma(R^{*}O+RO^{*})}
+Cross term $2|R||O|\cos(\varphi_o-\varphi_r)$. \textbf{FTM} (Takeda 1982) needs a slowly varying, low-bandwidth object. Carrier $R=R_0\exp(i2\pi f_0 x)$:
+\eq{H=|O|^2+|R_0|^2+2|O||R_0|\cos(2\pi f_0 x-\varphi_o)}
+Steps: 2D FFT $\to$ isolate one sideband $\to$ shift it to DC $\to$ inverse FFT $\to$ $O$, then $\varphi_o=\arg(O)$. Spectrum sketch: DC (zero order) at the origin and two conjugate sidebands at $\pm f_0$.
+Object bandwidth $2B\times 2B$. Bands do not overlap only if $3B\le f_0$, i.e.\ $\theta\ge\arcsin(3B\lambda)$ (L13, (106)). Sampling: $1/(4p)\ge f_0\ge 3B$ (107). An oversized filter admits DC. FTM is one frame and loses resolution because of that filter. Lecture point: the single-shot hologram still \emph{contains} full-resolution information; the loss is an artifact of FTM, not of the data.
+
+\sect{7. Four-step phase shifting}
+Reference waves $R$, $Re^{i\pi/2}$, $Re^{i\pi}$, $Re^{i3\pi/2}$ (phase plate or piezo). Lecture (109), with $\Delta\varphi=\varphi_r-\varphi_o$:
+\eq{H_1=|R|^2+|O|^2+2|R||O|\cos\Delta\varphi}
+\eq{H_2=|R|^2+|O|^2-2|R||O|\sin\Delta\varphi}
+\eq{H_3=|R|^2+|O|^2-2|R||O|\cos\Delta\varphi}
+\eq{H_4=|R|^2+|O|^2+2|R||O|\sin\Delta\varphi}
+\eq{\Delta\varphi=\arctan\!\left(\frac{H_4-H_2}{H_3-H_1}\right)}
+Use $\operatorname{atan2}(H_4-H_2,\,H_3-H_1)$ so the quadrant is correct. Four frames, vibration-sensitive hardware, no sideband filter, full pixel resolution. \textbf{FTM vs phase shifting:} one frame and a resolution loss, versus four frames and full resolution.
+
+\sect{8. Optimization fringe analysis and phase accuracy}
+A single hologram is not unique: pick any $\varphi_o$ and the quadratic in $|O|$ still has a positive root that fits $H$ (L15, (115)--(116)). Cost (117):
+\eq{C(O,O^{*})=\bigl\|H-|R+O|^2\bigr\|^2+\alpha\,\psi(O,O^{*})}
+\eq{\nabla_{O^{*}}C=-2\bigl[H-|R+O|^2\bigr](R+O)+\alpha\nabla_{O^{*}}\psi}
+Iteration (119), $h$ a Gaussian because a Fresnel-zone field is smooth, $t$ a step:
+\eq{O^{(n+1)}=h*\bigl[O^{(n)}-t\{\nabla_{O^{*}}C_{\mathrm{err}}\}_{O^{(n)}}\bigr]}
+The penalty makes neighbouring pixels talk, so this is not classical film replay. TV penalty keeps edges. Single-shot hardware can then match phase shifting.
+\textbf{Accuracy} (single pixel, Poisson). $N$ mean photons:
+\eq{N_{1,2}\approx\frac{N}{2}\bigl[1\pm\sin\Delta\varphi\bigr],\quad
+N_s=N\sin\Delta\varphi,\quad\sigma_{N_s}=\sqrt{N}}
+\eq{\mathrm{SNR}\approx\sqrt{N}\,\Delta\varphi
+\quad\Rightarrow\quad
+\Delta\varphi\sim 1/\sqrt{N}\ \text{(SQL at SNR}=1\text{)}}
+This bound is single-pixel. Real phase maps are redundant across pixels. Optimization that uses that sparsity can beat the SQL (PRA 91, 021802, 2015).
+
+\sect{9. Inline holography and propagation}
+$R$ and $O$ are collinear. $H=|R+O|^2$ contains $|R|^2$, a focused object term, and a defocused twin. $|O|^2$ is usually weak. Back-propagation (L17, (121)):
+\eq{g_{-z}=\mathcal{F}^{-1}\!\bigl[\tilde H\exp(-i\alpha z)\bigr]}
+Focus: sparsest gradient image. $u=|\nabla g_{-z}|$, Tamura coefficient $\mathrm{SoG}(u)=\sqrt{\sigma_u/\langle u\rangle}$. Entropy or Gini are alternatives. Lecture Fresnel transport of a paraxial field (L18, (132)), $k=2\pi/\lambda$:
+\eq{u(z)=\iint U(f_x,f_y;0)\,e^{ikz-i\pi\lambda z(f_x^2+f_y^2)+i2\pi(f_x x+f_y y)}\,df_x df_y}
+The quadratic phase $-i\pi\lambda z(f_x^2+f_y^2)$ is the Fresnel propagator used in the notes. (The exact propagating-wave factor is $e^{ik_z z}$ with $k_z=\sqrt{k^2-k_x^2-k_y^2}$; evanescent $k_z$ decays. The written lecture formula is the Fresnel one above.)
+Sparse inline model (124), $|O|^2$ dropped: minimize $\|H-|R|^2-R^{*}(\hat A U)-R(\hat A U)^{*}\|^2+\alpha\|U\|_1$. Sparsity removes the twin.
+
+\sect{10. Transport of intensity (TIE)}
+No reference beam. Two defocused intensities give the phase. Paraxial Helmholtz leads to (L18, (139))
+\eq{-k\,\partial_z I=\nabla_{xy}\!\cdot(I\nabla_{xy}\theta)}
+Lab derivative: record two planes and form $\partial_z I$. Constant amplitude $I_0$:
+\eq{-k\,\partial_z I=I_0\nabla^2\theta,\qquad
+\theta=-(k/I_0)\,\nabla^{-2}(\partial_z I)}
+Inverse Laplacian (143), $D=-4\pi^2(f_x^2+f_y^2)$:
+\eq{\nabla^{-2}g=\mathcal{F}^{-1}\!\left[G\,\frac{D}{D^2+\varepsilon^2}\right]}
+The filter is 0 at DC; a constant phase does not matter. Defocus approximation (144):
+\eq{I(\Delta z)\approx I(0)\bigl[1-(\lambda\Delta z/\pi)\nabla^2\theta\bigr]}
+Small $\Delta z$ is a better derivative but the difference can fall inside read noise. General solution, $\psi=I\nabla\theta$ (147):
+\eq{\theta=-k\,\nabla^{-2}\nabla\!\cdot\!\bigl[(1/I)\,\nabla\,\nabla^{-2}(\partial_z I)\bigr]}
+All steps are derivatives. Division by $I$ is unstable where $I=0$. \textbf{Unwrapping:} TIE never uses $\arctan$, so the phase comes out unwrapped. A separate unwrapping lecture is marked ``later'' and is not in these slides; do not invent an unwrapping algorithm.
+
+\sect{11. Fourier ptychography and phase diversity}
+Resolution of a 4f system: shorter $\lambda$ or a larger Fourier aperture (narrower PSF). Tilted illumination shifts the spectrum through that aperture (L20, (154)):
+\eq{\mathcal{F}\bigl[e^{i2\pi f_0 x}u_{\mathrm{in}}\bigr]=U_{\mathrm{in}}(f_x-f_0,f_y)}
+Frequencies that missed the aperture now pass. Many tilts fill a larger band. The detector loses phase, so recovery is a GS-like loop over the measured bands (unlike SAR, where the returns are added coherently). A 10$\times$ objective can behave like about 20$\times$, and it keeps the field and depth of focus of the low-NA lens. Real-space ptychography (scanning probe, overlapping windows):
+\eq{D_j=\bigl|\mathcal{F}\{O(x,y)\,P(x-x_j,y-y_j)\}\bigr|^2}
+\textbf{Defocus diversity} (Almoro, Pedrini, Osten 2006): several defocus planes instead of several tilts. First and last frames must be weakly correlated or the extra frames add little. GS chain: random start $\to$ propagate to plane 1, replace amplitude by $\sqrt{I_1}$ $\to$ propagate to plane 2, replace by $\sqrt{I_2}$, and so on. How many frames depends on object complexity and noise; the slides give no fixed rule.
+\textbf{Non-interferometric list on the slides:} TIE, GS, HIO, complexity guidance, Fourier ptychography, defocus diversity. Interferometric list: inline, off-axis, phase shifting, optimization. No reference beam means the phase is not stored in fringes. Shack--Hartmann is named as another non-interferometric sensor; these slides do not give its formula.
+
+\sect{12. Optimization phase retrieval and complexity}
+Wirtinger flow (Cand\`es). Cost (150):
+\eq{C(g,g^{*})=\bigl\||G|^2-|\mathcal{F}\{g\}|^2\bigr\|^2+\alpha\psi(g,g^{*})}
+Poor for one diffraction pattern. Use several coded patterns $|G_k|^2=|\mathcal{F}\{c_k g\}|^2$ and sum the errors. PhaseLift is the other named convex method. HIO is still what experiments use for one shot.
+Complexity (152)--(153), known from $|G|$ alone by Parseval:
+\eq{\zeta=\iint(|\nabla_x g|^2+|\nabla_y g|^2)\,dx\,dy
+=4\pi^2\iint(f_x^2+f_y^2)|G|^2\,df_x df_y}
+$\zeta$ says how much sparsity to apply, analogous to choosing $\alpha$.
+
+\sect{13. Projection imaging, FBP, common line}
+Projection along $z$ (exam notation; $G=\mathcal{F}_{3D}\{g\}$):
+\eq{p(x,y)=\int g(x,y,z)\,dz}
+\eq{P(f_x,f_y)=\iiint g\,e^{-i2\pi(f_x x+f_y y)}\,dx\,dy\,dz=G(f_x,f_y,0)}
+So the 2D FT of the projection is the plane $f_z=0$ of the 3D transform (projection-slice theorem). A new angle selects a new central plane. Many angles fill Fourier space; then invert. Two X-ray views are only two planes, so a general 3D object is not unique. CT practice in the slides: about 1000 views.
+\textbf{Common line:} the 2D FTs of two projections share the line where their two central planes intersect. Used to relate unknown angles (cryo-EM). Particles are weak phase objects, $\psi\approx\psi_0(1+i\phi)$, and the image is an inline hologram of the projected potential. Dose is low; cluster, align, and average. Reconstruction in the slides uses $\sim$60{,}000 images.
+\textbf{FBP} (Ramachandran \& Lakshminarayanan). Plain back-projection smears and blurs. Steps: (1) multiply the FT of each projection by the ramp $|\nu|$ (Ram--Lak); (2) inverse FT; (3) integrate over angle $\theta$. Equivalent split: $|\nu|=-i\,\mathrm{sgn}(\nu)\cdot(i\nu)$, so differentiate along $t$, back-project, then Hilbert-transform.
+
+\sect{14. Structured illumination (SIM)}
+Incoherent, usually fluorescence. Slides: about double the resolution; similar idea to Fourier ptychography (a pattern mixes frequencies into the passband). Same noise on every frame.
+\eq{g^{\mathrm{out}}_k=[g_{\mathrm{in}}s_k]*h+n_k}
+\eq{G^{\mathrm{out}}_k=[G_{\mathrm{in}}*S_k]\,H+N_k}
+The $*$ in the second line is convolution. Cosine code (180)--(181):
+\eq{s=\tfrac12\bigl[1+m\cos(2\pi f_0 x+\Phi)\bigr]}
+\eq{S=\tfrac12\Bigl[\delta+\tfrac{m}{2}e^{i\Phi}\delta(f_x-f_0,f_y)+\tfrac{m}{2}e^{-i\Phi}\delta(f_x+f_0,f_y)\Bigr]}
+The $\tfrac12\times\tfrac{m}{2}$ peaks are the same as coefficients $m/4$. DC plus peaks at $\pm f_0$. Three orientations ($0^\circ,45^\circ,135^\circ$) and three phases: 9 frames. Solving the $3\times 3$ system at each $(f_x,f_y)$ returns $G_{\mathrm{in}}H$, $G_{\mathrm{in}}(f_x-f_0)H(f_x-f_0)$ and $G_{\mathrm{in}}(f_x+f_0)H(f_x+f_0)$. Stitch with the generalized Wiener filter (187)--(189):
+\eq{W_m=\frac{H_m^{*}}{S_{\mathrm{noise}}/S_{\mathrm{obj}}+\sum_m|H_m|^2},\quad
+\hat G_{\mathrm{in}}=\sum_m W_m G_m}
+\textbf{Stochastic localization} is named on the slides but not derived here. Retained idea: many frames of sparse blinking emitters, localize each isolated PSF to a fraction of a pixel, then pool. Emitters in one frame must not overlap. \textbf{Plenoptic:} a microlens array records position and angle; refocus later; more angles means fewer spatial samples. \textbf{Focus stack:} after alignment, summing planes can give every in-focus layer nearly the same combined PSF, so one deconvolution applies.
+
+\sect{15. Cubic phase mask and rotating PSF}
+Defocused pupil $P(x)=P_0(x)e^{i\alpha x^2}$, power-law mask $P_0=e^{i\beta x^{\gamma}}$ (L23, (169)--(170)). OTF is $\int P(x+u/2)P^{*}(x-u/2)\,dx$. Stationary phase: $\theta'(x_0)=0$ and $\theta''(x_0)$ independent of defocus $\alpha$. Both hold at $\gamma=3$. Slide (175) prints
+\eq{\mathrm{OTF}(u)\approx\sqrt{\frac{\pi}{3\beta u}}\,\exp\!\Bigl[-i\frac{\alpha^2 u}{12\beta}+\frac{i\beta^3}{4}\Bigr]}
+Design: choose $\beta$ so $\alpha^2 u/(12\beta)$ is small; then the OTF barely depends on $\alpha$. The image looks coded, but one deconvolution serves a range of depths. \emph{Check in a derivation:} expanding $(x\pm u/2)^3$ inside $\theta(x)$ produces a term $\beta u^3/4$, not $\beta^3$. If a written step asks for the expansion, the $u^3$ term is the one that follows from (172).
+\textbf{Rotating PSF:} a stack of Laguerre--Gaussian modes with $(p_{j+1}-p_j)/(l_{j+1}-l_j)=\mathrm{const}$ rotates over a limited defocus. Depth $\leftrightarrow$ rotation angle (Piestun, Moerner).
+
+\sect{16. DOE for a laser-pointer pattern}
+Exam Q5. The cap is a diffractive optical element: a phase plate, $t=e^{i\varphi}$, so $|t|=1$ and absorption is ideally zero. Not an opaque mask if light loss must stay small. Design is the same phase-retrieval loop as GS, phase-only: (1) set the far-field target intensity; (2) start with uniform amplitude and a random phase; (3) FFT to the target; (4) replace the amplitude by $\sqrt{I_{\mathrm{target}}}$, keep the phase; (5) inverse FFT; (6) force $|t|=1$, keep the phase; (7) stop when the error is small; quantize the phase for fabrication. Limits: feature size, number of phase levels, index, wavelength.
+Far-field scale: pattern width $W$ at distance $z$ sets $f\sim W/(\lambda z)$, so the feature scale is $\Delta x\sim 1/f\sim\lambda z/W$. For $\lambda=532\,\mathrm{nm}$, $z=5\,\mathrm{m}$, $W=0.1\,\mathrm{m}$: $\Delta x\approx 26.6\,\mu\mathrm{m}$. Say whether $W$ is the full width. A half-width changes the answer by 2. This scaling is the estimate for the exam; these slides do not re-derive it.
+
+\sect{17. Alvarez lens (exam derivation)}
+Exam transmission, $F=x^3/3+xy^2$:
+\eq{\varphi_1=AF+C,\qquad\varphi_2=-AF+C}
+Shift the first plate by $+\delta$ and the second by $-\delta$ along $x$. In the Fourier plane of a 4f system the phases add:
+\eq{\varphi_{\mathrm{tot}}=A\,F(x-\delta,y)-A\,F(x+\delta,y)+2C}
+\eq{F(x-\delta,y)-F(x+\delta,y)=-2\delta(x^2+y^2)-\tfrac23\delta^3}
+\eq{\varphi_{\mathrm{tot}}=-2A\delta(x^2+y^2)-\tfrac23 A\delta^3+2C}
+The last two terms are a global phase. The quadratic piece is a thin lens. Match $\varphi_L=-k(x^2+y^2)/(2f)$, $k=2\pi/\lambda$:
+\eq{\frac{1}{f}=\frac{4A\delta}{k}=\frac{2A\delta\lambda}{\pi}}
+The sign follows this $\varphi_L$ convention. Changing $\delta$ changes the power $1/f$.
+
+\sect{18. What the 2025 paper asks}
+\textbf{Q1 PSF.} $1/50\,\mathrm{s}$: narrow PSF. $1/5\,\mathrm{s}$ plus handshake: long motion PSF. Deblur with Wiener. Quality depends on OTF bandwidth and on zeros.
+\textbf{Q2 Lensless.} Laser $\to$ sparse RBCs $\to$ sensor at $z$. State $p\le\lambda/(2\sin\theta)$ and the $4p$ camera rule. Find $z$ by focus; recover phase by GS or back-propagation.
+\textbf{Q3 Phase.} Camera sees fringes. Draw DC $+$ two sidebands. Do FTM or four-step, and say which resolution you get.
+\textbf{Q4 Tomography.} Prove $P(f_x,f_y)=G(f_x,f_y,0)$. Two views are two planes. Define the common line.
+\textbf{Q5 Laser cap.} DOE, phase-only iteration, $|t|=1$, $\Delta x\approx 26.6\,\mu\mathrm{m}$.
+\textbf{Q6 Alvarez.} Cubic terms cancel; leftover is a tunable lens, $1/f=2A\delta\lambda/\pi$, placed in the 4f Fourier plane.
+\textbf{Q7 Coded shutter.} Draw the line PSF and the coded impulses, and the sinc zeros against the coded spectrum. Wiener on both; the coded OTF has fewer deep zeros.
+\textbf{Not in these slides or that paper:} correlation / ghost imaging. It is omitted on purpose. Phase unwrapping is only the TIE remark in \S10.
+
+\end{multicols}
+\end{document}
