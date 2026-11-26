@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """PYD411 end-term slides. 16:9, navy/teal, editable.
 
-Title + 8 content slides + thank you.
+Title + 9 content slides + thank you.
 No four-cell material. Numbers are the ones already in the end-term report.
 """
 
@@ -26,11 +26,13 @@ WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 LIGHT = RGBColor(0xF4, 0xF7, 0xFA)
 LINE = RGBColor(0xD0, 0xD7, 0xDE)
 SOFT = RGBColor(0xE7, 0xF3, 0xF1)
+EQBG = RGBColor(0xEF, 0xF5, 0xF7)
 
 FONT = "Calibri"
+MATH = "Cambria Math"
 W = Inches(13.333)
 H = Inches(7.5)
-TOTAL = 10  # title + 8 content + thank you
+TOTAL = 11  # title + 9 content + thank you
 
 
 def rect(slide, l, t, w, h, fill, line=None):
@@ -93,6 +95,55 @@ def add_text(tf, text, size, color, bold=False, align=PP_ALIGN.LEFT, before=0, a
     r.font.italic = italic
     r.font.name = FONT
     return p
+
+
+def _baseline(run, sub=False, sup=False):
+    rPr = run._r.get_or_add_rPr()
+    rPr.set("baseline", "-25000" if sub else ("30000" if sup else "0"))
+
+
+def T(text, bold=False, italic=False, sub=False, sup=False, size=None, color=None):
+    d = {"text": text, "bold": bold, "italic": italic, "sub": sub, "sup": sup}
+    if size:
+        d["size"] = size
+    if color:
+        d["color"] = color
+    return d
+
+
+def mathpara(tf, segments, size=18, color=NAVY, align=PP_ALIGN.CENTER,
+             space_after=2, space_before=0, first=False):
+    if first and tf.paragraphs[0].text == "" and not tf.paragraphs[0].runs:
+        p = tf.paragraphs[0]
+    else:
+        p = tf.add_paragraph()
+    p.alignment = align
+    p.space_after = Pt(space_after)
+    p.space_before = Pt(space_before)
+    p.clear()
+    for seg in segments:
+        r = p.add_run()
+        r.text = seg["text"]
+        r.font.size = Pt(seg.get("size", size))
+        r.font.bold = seg.get("bold", False)
+        r.font.italic = seg.get("italic", True)
+        r.font.color.rgb = seg.get("color", color)
+        r.font.name = MATH
+        if seg.get("sub"):
+            _baseline(r, sub=True)
+        elif seg.get("sup"):
+            _baseline(r, sup=True)
+    return p
+
+
+def eqbox(slide, l, t, w, h, label, lines, size=16):
+    rrect(slide, l, t, w, h, EQBG, TEAL)
+    tf = tb(slide, l + Inches(0.12), t + Inches(0.06), w - Inches(0.2), Inches(0.28))
+    fresh(tf, label, 12, TEAL, bold=True, after=0)
+    tf = tb(slide, l + Inches(0.08), t + Inches(0.32), w - Inches(0.16), h - Inches(0.40), MSO_ANCHOR.MIDDLE)
+    for i, segs in enumerate(lines):
+        mathpara(tf, segs, size=size, first=(i == 0), space_after=1)
+    return tf
 
 
 def fresh(tf, text, size, color, bold=False, align=PP_ALIGN.LEFT, before=0, after=3, italic=False):
@@ -207,32 +258,78 @@ def build():
         "V4: for a single cell, friction dominates viscosity, ratio about 0.006, so the Stokes solve is not needed. "
         "Area grows about 15 percent and h/h0 is about 0.87. Do not say the thickness falls by 15 percent. "
         "If kA is zero the cell inflates about 14 times and crawling stops. "
-        "The sentence that opens the next slide: a collision is different, because the cells push each other through the fluid."
+        "The next slide is Version 3 itself: those are the equations each cell integrates. "
+        "A collision is different from V4, because the cells push each other through the fluid."
     ))
 
-    # ========== 3 TWO-CELL RULES ==========
+    # ========== 3 VERSION 3 EQUATIONS ==========
     s = prs.slides.add_slide(blank)
-    chrome(s, "Two cells: two fields, one flow", "WHAT CHANGES, AND WHY")
+    chrome(s, "Version 3 is the solver each cell runs", "STOKES FLOW, ACTIVE STRESS, ANCHORING")
     footer(s, 3)
-    rules = [
-        ("Not one shared φ", "A single phase field joins the cells into one region as soon as they touch. Each cell keeps its own φ and its own P."),
-        ("One Stokes solve", "Both forces go in together. That is how one cell pushes the other. The single-cell Darcy law does not do this."),
-        ("Contact repulsion", "F_rep = k_rep ∫ φ₁² φ₂². It is zero until the interfaces overlap, so a larger k_rep cannot steer them early."),
-        ("A range, and a charge", "F_soft = k_soft q₁ q₂ ∫ φ₁² ψ₂, with q = area / reference area. Same structure as a product of two cell properties."),
-    ]
-    positions = [(0.35, 1.12), (6.85, 1.12), (0.35, 3.15), (6.85, 3.15)]
-    for (title, body), (x, y) in zip(rules, positions):
-        rrect(s, Inches(x), Inches(y), Inches(6.15), Inches(1.85), WHITE, LINE)
-        rect(s, Inches(x), Inches(y), Inches(0.08), Inches(1.85), TEAL)
-        tf = tb(s, Inches(x + 0.22), Inches(y + 0.12), Inches(5.75), Inches(0.4))
-        fresh(tf, title, 18, NAVY, bold=True, after=0)
-        tf = tb(s, Inches(x + 0.22), Inches(y + 0.55), Inches(5.75), Inches(1.15))
-        fresh(tf, body, 14, DARK, after=0)
-    rrect(s, Inches(0.35), Inches(5.18), Inches(12.65), Inches(1.82), SOFT, None)
-    tf = tb(s, Inches(0.55), Inches(5.30), Inches(12.25), Inches(1.55))
-    fresh(tf, "Overdamped torque, not stored angular momentum", 16, NAVY, bold=True, after=2)
-    fresh(tf, "τ = ξ_rot ω,    with    ξ_rot = ξ ∫ φ |r − r_cm|² dA  =  5.1×10⁴ for these cells.", 15, DARK, after=2)
-    fresh(tf, "A force along the line of centres does not torque a round cell. Head-on, the torque has to be zero. We do not add a spin by hand.", 14, DARK, after=0)
+    fit(s, ASSETS / "fig_v3_morph.png", Inches(0.28), Inches(1.08), Inches(5.35), Inches(4.55))
+    tf = tb(s, Inches(0.28), Inches(5.70), Inches(5.35), Inches(1.30))
+    fresh(tf, "Aster: speed 0.   Fan: aspect 2.91, speed 0.843.", 13, NAVY, bold=True, after=2)
+    fresh(tf, "Anchoring alone gives aspect 2.85. With the flow, 2.92. The flow adds about 2%.", 13, DARK, after=0)
+    eqbox(s, Inches(5.80), Inches(1.08), Inches(7.15), Inches(1.15), "TRANSPORT", [
+        [T("u", bold=True), T("  =  "), T("v", bold=True), T("  +  "), T("w"), T("0", sub=True), T(" "), T("P", bold=True)],
+    ], size=22)
+    eqbox(s, Inches(5.80), Inches(2.32), Inches(7.15), Inches(1.45), "SHAPE", [
+        [T("\u2202"), T("t", sub=True), T("\u03c6"), T(" + \u2207\u00b7(\u03c6 "), T("u", bold=True),
+         T(")  =  \u2212M [ \u03bc \u2212 \u039b g(\u03c6) ]", size=15)],
+        [T("g(\u03c6) = \u03c6(1\u2212\u03c6)", size=15)],
+    ], size=16)
+    eqbox(s, Inches(5.80), Inches(3.86), Inches(7.15), Inches(1.35), "POLARITY", [
+        [T("\u2202"), T("t", sub=True), T("P", bold=True), T(" + ("), T("u", bold=True), T("\u00b7\u2207)"), T("P", bold=True),
+         T("  =  \u2212"), T("\u03a9", bold=True), T("\u00b7"), T("P", bold=True),
+         T(" + \u03c7 "), T("D", bold=True), T("\u00b7"), T("P", bold=True), T(" \u2212 "), T("h", bold=True), T("/\u0393", size=15)],
+    ], size=15)
+    eqbox(s, Inches(5.80), Inches(5.30), Inches(7.15), Inches(1.70), "STOKES  \u2014  CALLED ONCE FOR BOTH CELLS", [
+        [T("0  =  \u2212\u2207p + \u03b7\u2207"), T("2", sup=True), T("v", bold=True),
+         T(" \u2212 \u03be "), T("v", bold=True), T(" + "), T("f", bold=True), T("1", sub=True),
+         T(" + "), T("f", bold=True), T("2", sub=True)],
+        [T("\u03c3"), T("act", sub=True), T("  =  \u2212\u03b6 \u03c6 "), T("PP", bold=True)],
+    ], size=16)
+    notes(s, (
+        "This is the start of the two-cell story. Each cell integrates Version 3. "
+        "Read the four boxes. Transport is treadmilling plus the flow. "
+        "Shape is the area-corrected Allen-Cahn: g is phi times one minus phi, and Lambda holds the area. "
+        "Polarity is advection, vorticity corotation, flow alignment, and relaxation. "
+        "Stokes is the force balance at Reynolds number about 10 to the minus 5. "
+        "Active stress is minus zeta phi P P, and zeta negative means contractility. "
+        "For two cells the only change in this box is that f is f1 plus f2. One solve, felt by both. "
+        "Version 4, v equals f over xi, is what we use for one cell. We do not use it once they collide."
+    ))
+
+    # ========== 4 TWO-CELL EXTRAS ==========
+    s = prs.slides.add_slide(blank)
+    chrome(s, "What we add when a second cell is there", "STILL VERSION 3  \u00b7  FOUR EXTRA RELATIONS")
+    footer(s, 4)
+    eqbox(s, Inches(0.32), Inches(1.10), Inches(6.30), Inches(1.85), "CONTACT  \u2014  ZERO UNTIL THE INTERFACES OVERLAP", [
+        [T("F"), T("rep", sub=True), T("  =  "), T("k"), T("rep", sub=True),
+         T(" \u222b \u03c6"), T("1", sub=True), T("2", sup=True), T(" \u03c6"), T("2", sub=True), T("2", sup=True), T(" dA")],
+        [T("\u03bc"), T("i", sub=True), T("  +=  2 "), T("k"), T("rep", sub=True),
+         T(" \u03c6"), T("i", sub=True), T(" \u03c6"), T("j", sub=True), T("2", sup=True)],
+    ], size=16)
+    eqbox(s, Inches(6.78), Inches(1.10), Inches(6.22), Inches(1.85), "RANGE  \u2014  STRENGTH IS A PRODUCT OF THE CELLS", [
+        [T("q"), T("i", sub=True), T("  =  "), T("A"), T("i", sub=True), T(" / "), T("A"), T("0", sub=True)],
+        [T("F"), T("soft", sub=True), T("  =  "), T("k"), T("soft", sub=True),
+         T(" q"), T("1", sub=True), T(" q"), T("2", sub=True),
+         T(" \u222b \u03c6"), T("1", sub=True), T("2", sup=True), T(" \u03c8"), T("2", sub=True), T(" dA")],
+    ], size=16)
+    eqbox(s, Inches(0.32), Inches(3.10), Inches(6.30), Inches(1.70), "ONE STOKES SOLVE, NOT TWO", [
+        [T("0  =  \u2212\u2207p + \u03b7\u2207"), T("2", sup=True), T("v", bold=True),
+         T(" \u2212 \u03be "), T("v", bold=True), T(" + "), T("f", bold=True), T("1", sub=True),
+         T(" + "), T("f", bold=True), T("2", sub=True)],
+    ], size=18)
+    eqbox(s, Inches(6.78), Inches(3.10), Inches(6.22), Inches(1.70), "TORQUE SETS A RATE, IT IS NOT STORED", [
+        [T("\u03c4  =  "), T("\u03be"), T("rot", sub=True), T(" \u03c9")],
+        [T("\u03be"), T("rot", sub=True), T("  =  \u03be \u222b \u03c6 |"), T("r", bold=True),
+         T(" \u2212 "), T("r", bold=True), T("cm", sub=True), T("|"), T("2", sup=True), T(" dA  =  5.1\u00d710"), T("4", sup=True)],
+    ], size=16)
+    rrect(s, Inches(0.32), Inches(5.00), Inches(12.68), Inches(1.95), NAVY, None)
+    tf = tb(s, Inches(0.55), Inches(5.18), Inches(12.25), Inches(1.65))
+    fresh(tf, "A larger contact repulsion cannot steer them before they touch.", 18, WHITE, bold=True, after=6)
+    fresh(tf, "It has no range. The soft term does, and its strength is the product of the two areas. A force along the line of centres does not torque a round cell, so a head-on meeting has to have zero torque. We do not add a spin by hand.", 15, WHITE, after=0)
     notes(s, (
         "This is the slide to be ready to write on the board. "
         "Separate fields, because one field merges. "
@@ -246,7 +343,7 @@ def build():
     # ========== 4 CONTACT ==========
     s = prs.slides.add_slide(blank)
     chrome(s, "They meet, and they stay two cells", "CONTACT REPULSION ONLY")
-    footer(s, 4)
+    footer(s, 5)
     fit(s, ASSETS / "offset_collision.png", Inches(0.28), Inches(1.05), Inches(8.15), Inches(4.55))
     stats = [
         ("2.07", "Peak overlap in the closed-box walk. About 8.7 if the penalty is absent at nominal contact."),
@@ -268,7 +365,7 @@ def build():
     # ========== 5 AVOIDANCE + VIDEO ==========
     s = prs.slides.add_slide(blank)
     chrome(s, "Give the repulsion a range, and they miss", "k_soft = 15,   λ = 8,   SAME OFFSET")
-    footer(s, 5)
+    footer(s, 6)
     fit(s, ASSETS / "offset_avoidance.png", Inches(0.25), Inches(1.05), Inches(8.05), Inches(4.15))
     s.shapes.add_movie(
         str(ASSETS / "offset_avoidance.mp4"),
@@ -299,7 +396,7 @@ def build():
     # ========== 6 ANCHORING ==========
     s = prs.slides.add_slide(blank)
     chrome(s, "The heading turns because the edge does", "SAME RUN, ANCHORING SWITCHED OFF")
-    footer(s, 6)
+    footer(s, 7)
     trio = [
         ("35°", "Heading change", "Anchoring on. The cell deforms, and P stays normal to the new edge."),
         ("0.28°", "Rigid rotation", "∫ ω dt from τ = ξ_rot ω. Real, and too small to see."),
@@ -332,7 +429,7 @@ def build():
     # ========== 7 GLANCING ==========
     s = prs.slides.add_slide(blank)
     chrome(s, "A free walk, and a forced glancing meeting", "REPULSION STRENGTH 60  ·  TIME 400  ·  SHARED STOKES")
-    footer(s, 7)
+    footer(s, 8)
     fit(s, ASSETS / "two_cell_steric_paths.png", Inches(0.25), Inches(1.05), Inches(4.05), Inches(4.05))
     fit(s, ASSETS / "two_cell_glancing_paths.png", Inches(4.40), Inches(1.05), Inches(4.05), Inches(4.05))
     fit(s, ASSETS / "two_cell_glancing_response.png", Inches(8.55), Inches(1.05), Inches(4.45), Inches(4.05))
@@ -357,7 +454,7 @@ def build():
     # ========== 8 WALK VIDEO ==========
     s = prs.slides.add_slide(blank)
     chrome(s, "Walking in a closed box", "REPULSION ONLY  ·  EACH CELL PICKS A DIRECTION")
-    footer(s, 8)
+    footer(s, 9)
     s.shapes.add_movie(
         str(ASSETS / "two_cell_walk.mp4"),
         Inches(0.4), Inches(1.15), Inches(5.5), Inches(5.5),
@@ -381,7 +478,7 @@ def build():
     # ========== 9 CLAIMS ==========
     s = prs.slides.add_slide(blank)
     chrome(s, "Four statements we can defend", "AND THREE WE WILL NOT MAKE")
-    footer(s, 9)
+    footer(s, 10)
     claims = [
         ("1", "A treadmilling gradient at a wall makes a protrusion. Without it the cell only translates, and loses 4.5% of its area."),
         ("2", "In the top view the fan is set by anchoring. The flow adds about 2%. The aster does not crawl."),
